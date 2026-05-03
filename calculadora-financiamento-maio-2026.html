@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Financiamento Imobiliário - Maio 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .mode-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .mode-btn.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .mode-btn h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .mode-btn p {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .info-disclaimer {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .info-disclaimer h4 {
+            color: #1e40af;
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-disclaimer p {
+            color: #1e40af;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .info-disclaimer ul {
+            list-style: none;
+            margin-left: 0;
+            margin-top: 10px;
+        }
+
+        .info-disclaimer li {
+            color: #1e40af;
+            padding: 6px 0;
+            padding-left: 24px;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .info-disclaimer li:before {
+            content: "•";
+            position: absolute;
+            left: 8px;
+            font-weight: bold;
+        }
+
+        .info-disclaimer strong {
+            color: #1e3a8a;
+        }
+
+        .bank-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .bank-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .bank-card.approved {
+            border-color: #10b981;
+            background: linear-gradient(to right, #ecfdf5 0%, #ffffff 100%);
+        }
+
+        .bank-card.rejected {
+            border-color: #ef4444;
+            background: linear-gradient(to right, #fef2f2 0%, #ffffff 100%);
+        }
+
+        .bank-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .bank-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-badge.approved {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-badge.rejected {
+            background: #ef4444;
+            color: white;
+        }
+
+        .bank-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .rejection-details {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .rejection-details h4 {
+            color: #ef4444;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .rejection-details ul {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .rejection-details li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            color: #666;
+        }
+
+        .rejection-details li:before {
+            content: "✗";
+            position: absolute;
+            left: 0;
+            color: #ef4444;
+            font-weight: bold;
+        }
+
+        .suggestions {
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .suggestions h4 {
+            color: #10b981;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .suggestions ul {
+            list-style: none;
+        }
+
+        .suggestions li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            color: #666;
+        }
+
+        .suggestions li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .alternatives {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .alternatives h4 {
+            color: #3b82f6;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .bank-info-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .bank-info-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .bank-info-box ul {
+            list-style: none;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .bank-info-box li {
+            padding: 4px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .bank-info-box li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+
+        .warning-box {
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .warning-box strong {
+            color: #f59e0b;
+        }
+
+        .approval-notice {
+            background: #ecfdf5;
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .approval-notice h5 {
+            color: #059669;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .approval-notice p {
+            color: #047857;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .mode-selector {
+                flex-direction: column;
+            }
+
+            .mode-btn {
+                min-width: 100%;
+            }
+
+            .bank-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Calculadora de Financiamento Imobiliário</h1>
+            <p>Dados Verificados - Maio 2026 | 10 Instituições Financeiras</p>
+        </div>
+
+        <div class="content">
+            <div class="mode-selector">
+                <div class="mode-btn active" data-mode="inteligente">
+                    <h3>Inteligente</h3>
+                    <p>Sugere TOP 3 melhores opções</p>
+                </div>
+                <div class="mode-btn" data-mode="todos">
+                    <h3>Comparar Todos</h3>
+                    <p>Ranking completo (10 bancos)</p>
+                </div>
+                <div class="mode-btn" data-mode="especifico">
+                    <h3>Banco Específico</h3>
+                    <p>Análise detalhada</p>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Dados do Financiamento</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Valor do Imóvel (R$)</label>
+                        <input type="text" id="valorImovel" placeholder="R$ 600.000,00" value="600000">
+                    </div>
+                    <div class="form-group">
+                        <label>Entrada (R$)</label>
+                        <input type="text" id="entrada" placeholder="R$ 120.000,00" value="120000">
+                    </div>
+                    <div class="form-group">
+                        <label>FGTS Disponível (R$)</label>
+                        <input type="text" id="fgts" placeholder="R$ 20.000,00" value="20000">
+                    </div>
+                    <div class="form-group">
+                        <label>Renda Mensal Bruta (R$)</label>
+                        <input type="text" id="renda" placeholder="R$ 13.000,00" value="13000">
+                    </div>
+                    <div class="form-group">
+                        <label>Prazo (meses)</label>
+                        <input type="number" id="prazo" placeholder="360" value="360">
+                    </div>
+                    <div class="form-group">
+                        <label>Sistema de Amortização</label>
+                        <select id="sistema">
+                            <option value="SAC">SAC (Parcelas Decrescentes)</option>
+                            <option value="PRICE">PRICE (Parcelas Fixas)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="bancoEspecificoContainer" style="display: none; margin-top: 20px;">
+                    <div class="form-group">
+                        <label>Selecione o Banco</label>
+                        <select id="bancoEspecifico">
+                            <option value="">-- Escolha um banco --</option>
+                            <option value="CAIXA">Caixa Econômica Federal</option>
+                            <option value="BB">Banco do Brasil</option>
+                            <option value="ITAU">Itaú Unibanco</option>
+                            <option value="SANTANDER">Santander</option>
+                            <option value="BRADESCO">Bradesco</option>
+                            <option value="INTER">Banco Inter</option>
+                            <option value="SICREDI">Sicredi</option>
+                            <option value="SICOOB">Sicoob</option>
+                            <option value="VIACREDI">Viacredi (Ailos)</option>
+                            <option value="BRB">BRB - Banco de Brasília</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="calcular()">Calcular Financiamento</button>
+            </div>
+
+            <div id="results" class="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const BANCOS = {
+            CAIXA: {
+                nome: 'Caixa Econômica Federal',
+                taxa: 11.19,
+                ltv: 80,
+                prazoMax: 420,
+                limiteMax: 2250000,
+                mcmv: true,
+                renda_min: 0,
+                detalhes: {
+                    tipo_taxa: 'TR',
+                    mcmv_info: 'Principal operador MCMV - Faixa 1: 4,00-4,25% | Faixa 2: 4,75-7,00% | Faixa 3: 8,16% | Faixa 4: 10,50%',
+                    ltv_mcmv: 'MCMV Novos: 80% | MCMV Usados F1-2: 80% | F3: 65% | F4: 60% (Sul/Sudeste) ou 80%',
+                    diferenciais: 'Menor taxa do mercado, líder MCMV, aceita FGTS'
+                }
+            },
+            BRB: {
+                nome: 'BRB - Banco de Brasília',
+                taxa: 11.36,
+                ltv: 80,
+                prazoMax: 420,
+                limiteMax: 2250000,
+                mcmv: false,
+                renda_min: 0,
+                detalhes: {
+                    tipo_taxa: 'TR',
+                    mcmv_info: 'Não confirmado',
+                    diferenciais: '2ª menor taxa do mercado, banco público regional (DF + 11 estados)'
+                }
+            },
+            ITAU: {
+                nome: 'Itaú Unibanco',
+                taxa: 11.60,
+                ltv: 80,
+                prazoMax: 420,
+                limiteMax: 2000000,
+                mcmv: false,
+                renda_min: 0,
+                detalhes: {
+                    tipo_taxa: 'TR',
+                    mcmv_info: 'NÃO opera ainda (previsão 2º semestre 2026, focará Faixa 4)',
+                    diferenciais: 'Aprovação digital rápida (horas), taxa reduzida em dez/2025 de 11,70%'
+                }
+            },
+            BRADESCO: {
+                nome: 'Bradesco',
+                taxa: 11.70,
+                ltv: 80,
+                prazoMax: 420,
+                limiteMax: 2000000,
+                mcmv: false,
+                renda_min: 0,
+                detalhes: {
+                    tipo_taxa: 'TR ou Poupança Mais',
+                    mcmv_info: 'Não confirmado',
+                    diferenciais: 'Pula Parcela (1x/ano), financia até 5% custos cartório, LTV 70% comercial'
+                }
+            },
+            SANTANDER: {
+                nome: 'Santander',
+                taxa: 11.79,
+                ltv: 80,
+                prazoMax: 420,
+                limiteMax: 2000000,
+                mcmv: false,
+                renda_min: 0,
+                detalhes: {
+                    tipo_taxa: 'TR',
+                    mcmv_info: 'Não confirmado',
+                    diferenciais: 'Composição renda até 3 pessoas SEM vínculo familiar, financia ITBI/Registro, taxa reduzida de 11,99%'
+                }
+            },
+            BB: {
+                nome: 'Banco do Brasil',
+                taxa: 12.00,
+                ltv: 80,
+                prazoMax: 420,
+                limiteMax: 5000000,
+                mcmv: true,
+                renda_min: 20000,
+                detalhes: {
+                    tipo_taxa: 'TR',
+                    taxa_pro_cotista: '9,00% a.a. + TR (com FGTS)',
+                    mcmv_info: 'Participa do MCMV',
+                    diferenciais: 'Pró-Cotista 9% a.a., limite até R$5mi'
+                }
+            },
+            INTER: {
+                nome: 'Banco Inter',
+                taxa: 13.76,
+                ltv: 75,
+                prazoMax: 360,
+                limiteMax: 2000000,
+                mcmv: false,
+                renda_min: 0,
+                detalhes: {
+                    tipo_taxa: 'IPCA',
+                    taxa_alternativa: '9,5% a.a. + IPCA',
+                    mcmv_info: 'Não confirmado',
+                    diferenciais: '100% digital, ATENÇÃO: taxa indexada ao IPCA (maior risco inflacionário)',
+                    aviso: 'Taxa IPCA pode variar significativamente com inflação!'
+                }
+            },
+            SICREDI: {
+                nome: 'Sicredi',
+                taxa: 7.50,
+                ltv: 90,
+                prazoMax: 420,
+                limiteMax: 1500000,
+                mcmv: true,
+                renda_min: 0,
+                detalhes: {
+                    tipo_taxa: 'Varia por cooperativa',
+                    mcmv_info: 'Participa do MCMV',
+                    diferenciais: 'Cooperativa (necessário ser associado), LTV 90%, crescimento 42% em 2026'
+                }
+            },
+            SICOOB: {
+                nome: 'Sicoob',
+                taxa: 7.50,
+                ltv: 80,
+                prazoMax: 420,
+                limiteMax: 1500000,
+                mcmv: true,
+                renda_min: 0,
+                detalhes: {
+                    tipo_taxa: 'Varia por cooperativa',
+                    mcmv_info: 'Participa do MCMV',
+                    ltv_pro_cotista: 'Pró-Cotista SAC: até 90%',
+                    diferenciais: 'Cooperativa (necessário ser associado), composição renda até 3 pessoas'
+                }
+            },
+            VIACREDI: {
+                nome: 'Viacredi (Ailos)',
+                taxa: 6.20,
+                ltv: 90,
+                prazoMax: 420,
+                limiteMax: 350000,
+                mcmv: true,
+                renda_min: 0,
+                detalhes: {
+                    tipo_taxa: 'TR',
+                    taxa_mcmv: '4,25-8,16% a.a. + TR (varia por faixa MCMV)',
+                    taxa_pro_cotista: '8,66% a.a. + TR (renda >R$8.600)',
+                    mcmv_info: 'SOMENTE IMÓVEIS NOVOS no limite MCMV',
+                    ltv_detalhes: 'Novos MCMV: 90% (até R$350k) | Usados renda R$2.160-4.700: 90% | Usados renda R$4.700-8.600: 65% (max R$270k)',
+                    diferenciais: 'Cooperativa Ailos, crescimento 47% em 2025, projeção R$200mi MCMV em 2026'
+                }
+            }
+        };
+
+        let modoAtual = 'inteligente';
+
+        function aplicarMascaraDinheiro(input) {
+            let valor = input.value.replace(/\D/g, '');
+            valor = (parseInt(valor) / 100).toFixed(2);
+            valor = valor.replace('.', ',');
+            valor = valor.replace(/(\d)(?=(\d{3})+\,)/g, '$1.');
+            input.value = valor;
+        }
+
+        function removerMascara(valor) {
+            if (!valor) return 0;
+            return parseFloat(valor.toString().replace(/\./g, '').replace(',', '.')) || 0;
+        }
+
+        document.getElementById('valorImovel').addEventListener('blur', function() {
+            aplicarMascaraDinheiro(this);
+        });
+        document.getElementById('entrada').addEventListener('blur', function() {
+            aplicarMascaraDinheiro(this);
+        });
+        document.getElementById('fgts').addEventListener('blur', function() {
+            aplicarMascaraDinheiro(this);
+        });
+        document.getElementById('renda').addEventListener('blur', function() {
+            aplicarMascaraDinheiro(this);
+        });
+
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                modoAtual = this.dataset.mode;
+                
+                const bancoContainer = document.getElementById('bancoEspecificoContainer');
+                if (modoAtual === 'especifico') {
+                    bancoContainer.style.display = 'block';
+                } else {
+                    bancoContainer.style.display = 'none';
+                }
+            });
+        });
+
+        function calcular() {
+            const valorImovel = removerMascara(document.getElementById('valorImovel').value);
+            const entrada = removerMascara(document.getElementById('entrada').value);
+            const fgts = removerMascara(document.getElementById('fgts').value);
+            const renda = removerMascara(document.getElementById('renda').value);
+            const prazo = parseInt(document.getElementById('prazo').value) || 360;
+            const sistema = document.getElementById('sistema').value;
+
+            if (valorImovel <= 0 || renda <= 0) {
+                alert('Por favor, preencha todos os campos obrigatórios!');
+                return;
+            }
+
+            const entradaTotal = entrada + fgts;
+
+            if (modoAtual === 'inteligente') {
+                calcularInteligente(valorImovel, entradaTotal, renda, prazo, sistema);
+            } else if (modoAtual === 'todos') {
+                calcularTodos(valorImovel, entradaTotal, renda, prazo, sistema);
+            } else {
+                calcularEspecifico(valorImovel, entradaTotal, renda, prazo, sistema);
+            }
+        }
+
+        function calcularInteligente(valorImovel, entradaTotal, renda, prazo, sistema) {
+            const resultados = simularTodosBancos(valorImovel, entradaTotal, renda, prazo, sistema);
+            const aprovados = resultados.filter(r => r.aprovado).slice(0, 3);
+
+            let html = '<div class="info-disclaimer">';
+            html += '<h4>IMPORTANTE - LEIA ANTES DE CONSULTAR OS BANCOS</h4>';
+            html += '<p>Esta simulação utiliza os <strong>critérios máximos públicos</strong> de cada banco (LTV 80-90%). Na prática, o percentual aprovado pode ser menor baseado em:</p>';
+            html += '<ul>';
+            html += '<li><strong>Score de crédito:</strong> Histórico de pagamentos e inadimplência</li>';
+            html += '<li><strong>Análise bancária:</strong> Relacionamento com o banco e movimentação financeira</li>';
+            html += '<li><strong>Dívidas existentes:</strong> Outros financiamentos e compromissos financeiros</li>';
+            html += '<li><strong>Perfil de risco:</strong> Avaliação individual de cada instituição</li>';
+            html += '</ul>';
+            html += '<p><strong>Recomendação:</strong> Use esta simulação como referência inicial. Sempre consulte diretamente o banco para confirmação dos valores e condições reais de aprovação.</p>';
+            html += '</div>';
+
+            html += '<h2 style="margin-bottom: 20px;">TOP 3 Melhores Opções para Você</h2>';
+
+            if (aprovados.length === 0) {
+                html += '<div class="bank-card rejected"><h3>Nenhum banco aprovou com as condições informadas</h3>';
+                html += '<p style="margin-top: 10px;">Veja os motivos abaixo e ajuste sua simulação.</p></div>';
+                
+                resultados.slice(0, 3).forEach(res => {
+                    html += renderBankCard(res, valorImovel, entradaTotal, renda, prazo, sistema, true);
+                });
+            } else {
+                aprovados.forEach((res, index) => {
+                    html += renderBankCard(res, valorImovel, entradaTotal, renda, prazo, sistema, false);
+                });
+            }
+
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function calcularTodos(valorImovel, entradaTotal, renda, prazo, sistema) {
+            const resultados = simularTodosBancos(valorImovel, entradaTotal, renda, prazo, sistema);
+
+            let html = '<div class="info-disclaimer">';
+            html += '<h4>IMPORTANTE - LEIA ANTES DE CONSULTAR OS BANCOS</h4>';
+            html += '<p>Esta simulação utiliza os <strong>critérios máximos públicos</strong> de cada banco (LTV 80-90%). Na prática, o percentual aprovado pode ser menor baseado em:</p>';
+            html += '<ul>';
+            html += '<li><strong>Score de crédito:</strong> Histórico de pagamentos e inadimplência</li>';
+            html += '<li><strong>Análise bancária:</strong> Relacionamento com o banco e movimentação financeira</li>';
+            html += '<li><strong>Dívidas existentes:</strong> Outros financiamentos e compromissos financeiros</li>';
+            html += '<li><strong>Perfil de risco:</strong> Avaliação individual de cada instituição</li>';
+            html += '</ul>';
+            html += '<p><strong>Recomendação:</strong> Use esta simulação como referência inicial. Sempre consulte diretamente o banco para confirmação dos valores e condições reais de aprovação.</p>';
+            html += '</div>';
+
+            html += '<h2 style="margin-bottom: 20px;">Ranking Completo - 10 Bancos</h2>';
+
+            resultados.forEach(res => {
+                html += renderBankCard(res, valorImovel, entradaTotal, renda, prazo, sistema, true);
+            });
+
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function calcularEspecifico(valorImovel, entradaTotal, renda, prazo, sistema) {
+            const bancoSelecionado = document.getElementById('bancoEspecifico').value;
+
+            if (!bancoSelecionado) {
+                alert('Por favor, selecione um banco!');
+                return;
+            }
+
+            const resultado = simularBanco(bancoSelecionado, valorImovel, entradaTotal, renda, prazo, sistema);
+
+            let html = '<div class="info-disclaimer">';
+            html += '<h4>IMPORTANTE - LEIA ANTES DE CONSULTAR O BANCO</h4>';
+            html += '<p>Esta simulação utiliza os <strong>critérios máximos públicos</strong> do banco. Na prática, o percentual aprovado pode ser menor baseado em:</p>';
+            html += '<ul>';
+            html += '<li><strong>Score de crédito:</strong> Histórico de pagamentos e inadimplência</li>';
+            html += '<li><strong>Análise bancária:</strong> Relacionamento com o banco e movimentação financeira</li>';
+            html += '<li><strong>Dívidas existentes:</strong> Outros financiamentos e compromissos financeiros</li>';
+            html += '<li><strong>Perfil de risco:</strong> Avaliação individual da instituição</li>';
+            html += '</ul>';
+            html += '<p><strong>Recomendação:</strong> Use esta simulação como referência inicial. Sempre consulte diretamente o banco para confirmação dos valores e condições reais de aprovação.</p>';
+            html += '</div>';
+
+            html += '<h2 style="margin-bottom: 20px;">Análise Detalhada</h2>';
+            html += renderBankCard(resultado, valorImovel, entradaTotal, renda, prazo, sistema, true);
+
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function simularTodosBancos(valorImovel, entradaTotal, renda, prazo, sistema) {
+            const resultados = [];
+
+            for (const [codigo, banco] of Object.entries(BANCOS)) {
+                resultados.push(simularBanco(codigo, valorImovel, entradaTotal, renda, prazo, sistema));
+            }
+
+            return resultados.sort((a, b) => {
+                if (a.aprovado && !b.aprovado) return -1;
+                if (!a.aprovado && b.aprovado) return 1;
+                if (a.aprovado && b.aprovado) return a.parcelaInicial - b.parcelaInicial;
+                return a.banco.taxa - b.banco.taxa;
+            });
+        }
+
+        function simularBanco(codigo, valorImovel, entradaTotal, renda, prazo, sistema) {
+            const banco = BANCOS[codigo];
+            const valorFinanciado = valorImovel - entradaTotal;
+            const ltvSolicitado = (valorFinanciado / valorImovel) * 100;
+
+            const motivos = [];
+            let aprovado = true;
+
+            const entradaNecessaria = valorImovel * (1 - banco.ltv / 100);
+            if (entradaTotal < entradaNecessaria) {
+                aprovado = false;
+                const falta = entradaNecessaria - entradaTotal;
+                motivos.push(`Entrada insuficiente: Você tem R$ ${formatMoney(entradaTotal)}, precisa de R$ ${formatMoney(entradaNecessaria)} (faltam R$ ${formatMoney(falta)})`);
+            }
+
+            if (valorImovel > banco.limiteMax) {
+                aprovado = false;
+                motivos.push(`Valor do imóvel (R$ ${formatMoney(valorImovel)}) excede o limite do banco (R$ ${formatMoney(banco.limiteMax)})`);
+            }
+
+            if (prazo > banco.prazoMax) {
+                aprovado = false;
+                motivos.push(`Prazo solicitado (${prazo} meses) excede o máximo do banco (${banco.prazoMax} meses)`);
+            }
+
+            if (banco.renda_min > 0 && renda < banco.renda_min) {
+                aprovado = false;
+                motivos.push(`Renda (R$ ${formatMoney(renda)}) abaixo do mínimo exigido (R$ ${formatMoney(banco.renda_min)})`);
+            }
+
+            const taxaMensal = banco.taxa / 100 / 12;
+            let parcelaInicial = 0;
+
+            if (sistema === 'SAC') {
+                const amortizacao = valorFinanciado / prazo;
+                const jurosPrimeiraParcela = valorFinanciado * taxaMensal;
+                parcelaInicial = amortizacao + jurosPrimeiraParcela;
+            } else {
+                parcelaInicial = valorFinanciado * (taxaMensal * Math.pow(1 + taxaMensal, prazo)) / (Math.pow(1 + taxaMensal, prazo) - 1);
+            }
+
+            const comprometimento = (parcelaInicial / renda) * 100;
+            if (comprometimento > 30) {
+                aprovado = false;
+                motivos.push(`Renda comprometida: ${comprometimento.toFixed(1)}% da renda (máximo 30%). Parcela: R$ ${formatMoney(parcelaInicial)}`);
+            }
+
+            const cetEstimado = banco.taxa + 1.3;
+
+            return {
+                codigo,
+                banco,
+                aprovado,
+                motivos,
+                valorFinanciado,
+                parcelaInicial,
+                ltvSolicitado,
+                comprometimento,
+                entradaNecessaria,
+                cetEstimado
+            };
+        }
+
+        function renderBankCard(resultado, valorImovel, entradaTotal, renda, prazo, sistema, mostrarDetalhes) {
+            const { codigo, banco, aprovado, motivos, valorFinanciado, parcelaInicial, ltvSolicitado, comprometimento, entradaNecessaria, cetEstimado } = resultado;
+
+            let html = `<div class="bank-card ${aprovado ? 'approved' : 'rejected'}">`;
+            
+            html += `<div class="bank-header">
+                <div class="bank-name">${banco.nome}</div>
+                <div class="status-badge ${aprovado ? 'approved' : 'rejected'}">
+                    ${aprovado ? 'APROVADO' : 'REPROVADO'}
+                </div>
+            </div>`;
+
+            html += `<div class="bank-details">
+                <div class="detail-item">
+                    <div class="detail-label">Taxa Nominal</div>
+                    <div class="detail-value">${banco.taxa.toFixed(2)}% a.a. + ${banco.detalhes.tipo_taxa}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">CET (estimado)</div>
+                    <div class="detail-value">${cetEstimado.toFixed(2)}% a.a.</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">LTV Máximo</div>
+                    <div class="detail-value">${banco.ltv}%</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Prazo Máximo</div>
+                    <div class="detail-value">${banco.prazoMax} meses</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Limite Máximo</div>
+                    <div class="detail-value">R$ ${formatMoney(banco.limiteMax)}</div>
+                </div>`;
+
+            if (aprovado) {
+                html += `<div class="detail-item">
+                    <div class="detail-label">Valor Financiado</div>
+                    <div class="detail-value" style="color: #3b82f6;">R$ ${formatMoney(valorFinanciado)}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Parcela Inicial (${sistema})</div>
+                    <div class="detail-value" style="color: #10b981;">R$ ${formatMoney(parcelaInicial)}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Comprometimento</div>
+                    <div class="detail-value">${comprometimento.toFixed(1)}%</div>
+                </div>`;
+            }
+
+            html += `</div>`;
+
+            if (aprovado) {
+                html += `<div class="approval-notice">
+                    <h5>Atenção: Aprovação baseada em critérios públicos</h5>
+                    <p>O banco poderá aprovar um percentual menor (60-70% ao invés de ${banco.ltv}%) baseado na análise individual de crédito, score e histórico bancário. Consulte diretamente o banco para confirmar o percentual real de aprovação para seu perfil.</p>
+                </div>`;
+            }
+
+            if (mostrarDetalhes) {
+                html += `<div class="bank-info-box">
+                    <h4>INFORMAÇÕES DO ${banco.nome.toUpperCase()}</h4>
+                    <ul>`;
+                
+                if (banco.detalhes.taxa_mcmv) {
+                    html += `<li>Taxa MCMV: ${banco.detalhes.taxa_mcmv}</li>`;
+                }
+                if (banco.detalhes.taxa_pro_cotista) {
+                    html += `<li>Pró-Cotista: ${banco.detalhes.taxa_pro_cotista}</li>`;
+                }
+                if (banco.detalhes.taxa_alternativa) {
+                    html += `<li>Taxa Alternativa: ${banco.detalhes.taxa_alternativa}</li>`;
+                }
+                html += `<li>MCMV: ${banco.detalhes.mcmv_info}</li>`;
+                if (banco.detalhes.ltv_mcmv) {
+                    html += `<li>LTV MCMV: ${banco.detalhes.ltv_mcmv}</li>`;
+                }
+                if (banco.detalhes.ltv_detalhes) {
+                    html += `<li>${banco.detalhes.ltv_detalhes}</li>`;
+                }
+                if (banco.detalhes.ltv_pro_cotista) {
+                    html += `<li>${banco.detalhes.ltv_pro_cotista}</li>`;
+                }
+                html += `<li>Diferenciais: ${banco.detalhes.diferenciais}</li>`;
+                
+                html += `</ul></div>`;
+
+                if (banco.detalhes.aviso) {
+                    html += `<div class="warning-box">
+                        <strong>ATENÇÃO:</strong> ${banco.detalhes.aviso}
+                    </div>`;
+                }
+            }
+
+            if (!aprovado && mostrarDetalhes) {
+                html += `<div class="rejection-details">
+                    <h4>MOTIVOS DA REPROVAÇÃO</h4>
+                    <ul>`;
+                
+                motivos.forEach(motivo => {
+                    html += `<li>${motivo}</li>`;
+                });
+                
+                html += `</ul></div>`;
+
+                html += `<div class="suggestions">
+                    <h4>SUGESTÕES PARA APROVAÇÃO</h4>
+                    <ul>`;
+
+                if (entradaTotal < entradaNecessaria) {
+                    const falta = entradaNecessaria - entradaTotal;
+                    html += `<li>Aumente a entrada em R$ ${formatMoney(falta)} (use FGTS adicional ou poupança)</li>`;
+                }
+                if (comprometimento > 30) {
+                    html += `<li>Reduza o valor financiado ou aumente o prazo para diminuir a parcela</li>`;
+                    html += `<li>Considere composição de renda com cônjuge ou familiar</li>`;
+                }
+                if (valorImovel > banco.limiteMax) {
+                    html += `<li>Escolha um imóvel de até R$ ${formatMoney(banco.limiteMax)}</li>`;
+                }
+                
+                html += `</ul></div>`;
+
+                const alternativas = simularTodosBancos(valorImovel, entradaTotal, renda, prazo, sistema)
+                    .filter(r => r.aprovado && r.codigo !== codigo)
+                    .slice(0, 3);
+
+                if (alternativas.length > 0) {
+                    html += `<div class="alternatives">
+                        <h4>BANCOS QUE APROVARIAM SEU PERFIL</h4>
+                        <ul>`;
+                    
+                    alternativas.forEach(alt => {
+                        html += `<li>${alt.banco.nome} (taxa ${alt.banco.taxa.toFixed(2)}% a.a.) - Parcela: R$ ${formatMoney(alt.parcelaInicial)}</li>`;
+                    });
+                    
+                    html += `</ul></div>`;
+                }
+            }
+
+            html += `</div>`;
+
+            return html;
+        }
+
+        function formatMoney(value) {
+            if (!value && value !== 0) return '0,00';
+            return parseFloat(value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        window.addEventListener('load', function() {
+            aplicarMascaraDinheiro(document.getElementById('valorImovel'));
+            aplicarMascaraDinheiro(document.getElementById('entrada'));
+            aplicarMascaraDinheiro(document.getElementById('fgts'));
+            aplicarMascaraDinheiro(document.getElementById('renda'));
+        });
+    </script>
+</body>
+</html>

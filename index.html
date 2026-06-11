@@ -3,467 +3,549 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Financiamento Imobiliário - Maio 2026</title>
+    <title>Calculadora de Financiamento · Cal Oliveiras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --preto: #101010;
+            --terra-escuro: #313128;
+            --terra-medio: #493928;
+            --cinza: #8D927D;
+            --cinza-claro: #CECBBE;
+            --branco: #FFFFFF;
+            --aprovado: #4b6043;
+            --reprovado: #7d3b3b;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Outfit', sans-serif;
+            background: var(--preto);
+            color: var(--terra-escuro);
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px 16px;
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1120px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: var(--branco);
+            border-radius: 18px;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.45);
             overflow: hidden;
         }
 
+        /* ---------- HEADER / LOGO ---------- */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
+            background: var(--preto);
+            color: var(--branco);
+            padding: 38px 30px 30px;
             text-align: center;
+            border-bottom: 1px solid var(--terra-medio);
+        }
+
+        .logo-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 44px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+
+        .logo-sub {
+            font-size: 13px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--cinza-claro);
+            margin-top: 8px;
+        }
+
+        .logo-creci {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--cinza);
+            border: 1px solid var(--terra-medio);
+            border-radius: 20px;
+            padding: 4px 16px;
         }
 
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            font-size: 26px;
+            margin-top: 26px;
+            color: var(--branco);
         }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 14px;
+        .header .subtitle {
+            font-size: 13px;
+            color: var(--cinza);
+            margin-top: 6px;
         }
 
-        .content {
-            padding: 30px;
-        }
+        .content { padding: 30px; }
 
+        /* ---------- MODE SELECTOR ---------- */
         .mode-selector {
             display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 12px;
+            margin-bottom: 28px;
             flex-wrap: wrap;
         }
 
         .mode-btn {
             flex: 1;
             min-width: 200px;
-            padding: 20px;
-            border: 2px solid #e0e0e0;
+            padding: 18px;
+            border: 1.5px solid var(--cinza-claro);
             border-radius: 12px;
-            background: white;
+            background: var(--branco);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             text-align: center;
         }
 
         .mode-btn:hover {
-            border-color: #667eea;
+            border-color: var(--cinza);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
         }
 
         .mode-btn.active {
-            border-color: #667eea;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            border-color: var(--terra-medio);
+            background: var(--terra-escuro);
+            color: var(--branco);
         }
 
         .mode-btn h3 {
-            font-size: 18px;
-            margin-bottom: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 21px;
+            font-weight: 600;
+            margin-bottom: 4px;
         }
 
-        .mode-btn p {
-            font-size: 13px;
-            opacity: 0.8;
-        }
+        .mode-btn p { font-size: 12.5px; opacity: 0.85; }
 
+        /* ---------- FORM ---------- */
         .form-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 12px;
+            background: #f7f6f1;
+            padding: 26px;
+            border-radius: 14px;
             margin-bottom: 20px;
+            border: 1px solid var(--cinza-claro);
         }
 
         .form-section h3 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 18px;
+            font-family: 'Outfit', sans-serif;
+            color: var(--terra-medio);
+            margin-bottom: 18px;
+            font-size: 23px;
+            font-weight: 600;
+        }
+
+        /* Toggle Novo/Usado */
+        .tipo-toggle {
+            display: flex;
+            gap: 0;
+            margin-bottom: 24px;
+            border: 1.5px solid var(--cinza-claro);
+            border-radius: 10px;
+            overflow: hidden;
+            max-width: 420px;
+        }
+
+        .tipo-option {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            background: var(--branco);
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--cinza);
+        }
+
+        .tipo-option:first-child { border-right: 1.5px solid var(--cinza-claro); }
+
+        .tipo-option.active {
+            background: var(--terra-medio);
+            color: var(--branco);
+        }
+
+        .tipo-option small {
+            display: block;
+            font-weight: 400;
+            font-size: 11px;
+            margin-top: 3px;
+            opacity: 0.85;
         }
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
+        .form-group { display: flex; flex-direction: column; }
 
         .form-group label {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            color: #555;
-            margin-bottom: 8px;
+            color: var(--terra-escuro);
+            margin-bottom: 7px;
         }
 
         .form-group input,
         .form-group select {
             padding: 12px;
-            border: 2px solid #e0e0e0;
+            border: 1.5px solid var(--cinza-claro);
             border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+            color: var(--terra-escuro);
+            background: var(--branco);
+            transition: border-color 0.2s ease;
         }
 
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--terra-medio);
+        }
+
+        .section-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 19px;
+            font-weight: 600;
+            color: var(--terra-medio);
+            margin: 26px 0 14px;
+            padding-top: 20px;
+            border-top: 1px solid var(--cinza-claro);
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: var(--terra-medio);
+            color: var(--branco);
             border: none;
             padding: 16px 32px;
             border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
+            font-family: 'Outfit', sans-serif;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             width: 100%;
-            margin-top: 20px;
+            margin-top: 24px;
+            letter-spacing: 0.5px;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        .btn:hover { background: var(--terra-escuro); transform: translateY(-2px); }
+        .btn:active { transform: translateY(0); }
+
+        .results { margin-top: 30px; }
+
+        /* ---------- MCMV BANNER ---------- */
+        .mcmv-banner {
+            background: linear-gradient(135deg, var(--terra-escuro) 0%, var(--terra-medio) 100%);
+            color: var(--branco);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
         }
 
-        .btn:active {
-            transform: translateY(0);
+        .mcmv-banner h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
         }
 
-        .results {
-            margin-top: 30px;
+        .mcmv-banner .faixa-tag {
+            display: inline-block;
+            background: var(--branco);
+            color: var(--terra-medio);
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 10px;
         }
 
+        .mcmv-banner p { font-size: 14px; line-height: 1.6; color: var(--cinza-claro); }
+        .mcmv-banner strong { color: var(--branco); }
+
+        .mcmv-banner.destaque-f4 {
+            border: 2px solid var(--cinza-claro);
+        }
+
+        .mcmv-banner.indisponivel {
+            background: #f7f6f1;
+            color: var(--terra-escuro);
+            border: 1px solid var(--cinza-claro);
+        }
+        .mcmv-banner.indisponivel h4 { color: var(--terra-medio); }
+        .mcmv-banner.indisponivel p { color: var(--cinza); }
+        .mcmv-banner.indisponivel strong { color: var(--terra-escuro); }
+
+        /* ---------- DISCLAIMER ---------- */
         .info-disclaimer {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border-left: 4px solid #3b82f6;
+            background: #f7f6f1;
+            border-left: 4px solid var(--cinza);
             padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
+            border-radius: 10px;
+            margin-bottom: 24px;
         }
 
         .info-disclaimer h4 {
-            color: #1e40af;
-            margin-bottom: 12px;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-family: 'Outfit', sans-serif;
+            color: var(--terra-medio);
+            margin-bottom: 10px;
+            font-size: 19px;
+            font-weight: 600;
         }
 
-        .info-disclaimer p {
-            color: #1e40af;
-            line-height: 1.6;
-            margin-bottom: 12px;
-            font-size: 14px;
-        }
+        .info-disclaimer p { color: var(--terra-escuro); line-height: 1.6; margin-bottom: 10px; font-size: 13.5px; }
+        .info-disclaimer ul { list-style: none; margin-top: 8px; }
+        .info-disclaimer li { color: var(--terra-escuro); padding: 5px 0 5px 22px; position: relative; font-size: 13.5px; }
+        .info-disclaimer li:before { content: "•"; position: absolute; left: 6px; color: var(--terra-medio); font-weight: bold; }
+        .info-disclaimer strong { color: var(--terra-medio); }
 
-        .info-disclaimer ul {
-            list-style: none;
-            margin-left: 0;
-            margin-top: 10px;
-        }
-
-        .info-disclaimer li {
-            color: #1e40af;
-            padding: 6px 0;
-            padding-left: 24px;
-            position: relative;
-            font-size: 14px;
-        }
-
-        .info-disclaimer li:before {
-            content: "•";
-            position: absolute;
-            left: 8px;
-            font-weight: bold;
-        }
-
-        .info-disclaimer strong {
-            color: #1e3a8a;
+        /* ---------- BANK CARDS ---------- */
+        h2.results-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--terra-escuro);
+            margin-bottom: 20px;
         }
 
         .bank-card {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 25px;
+            background: var(--branco);
+            border: 1.5px solid var(--cinza-claro);
+            border-radius: 14px;
+            padding: 24px;
             margin-bottom: 20px;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
         }
 
-        .bank-card:hover {
-            border-color: #667eea;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
-        }
-
-        .bank-card.approved {
-            border-color: #10b981;
-            background: linear-gradient(to right, #ecfdf5 0%, #ffffff 100%);
-        }
-
-        .bank-card.rejected {
-            border-color: #ef4444;
-            background: linear-gradient(to right, #fef2f2 0%, #ffffff 100%);
-        }
+        .bank-card.approved { border-color: var(--aprovado); }
+        .bank-card.rejected { border-color: var(--reprovado); }
 
         .bank-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--cinza-claro);
         }
 
         .bank-name {
-            font-size: 22px;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .status-badge {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 25px;
             font-weight: 600;
+            color: var(--terra-escuro);
         }
 
-        .status-badge.approved {
-            background: #10b981;
-            color: white;
-        }
-
-        .status-badge.rejected {
-            background: #ef4444;
-            color: white;
-        }
+        .status-badge { padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .status-badge.approved { background: var(--aprovado); color: var(--branco); }
+        .status-badge.rejected { background: var(--reprovado); color: var(--branco); }
 
         .bank-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
         }
 
-        .detail-item {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-        }
-
-        .detail-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 4px;
-        }
-
-        .detail-value {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .rejection-details {
-            background: #fef2f2;
-            border-left: 4px solid #ef4444;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-
-        .rejection-details h4 {
-            color: #ef4444;
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-
-        .rejection-details ul {
-            list-style: none;
-            margin-bottom: 20px;
-        }
-
-        .rejection-details li {
-            padding: 8px 0;
-            padding-left: 24px;
-            position: relative;
-            color: #666;
-        }
-
-        .rejection-details li:before {
-            content: "✗";
-            position: absolute;
-            left: 0;
-            color: #ef4444;
-            font-weight: bold;
-        }
-
-        .suggestions {
-            background: #ecfdf5;
-            border-left: 4px solid #10b981;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .suggestions h4 {
-            color: #10b981;
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-
-        .suggestions ul {
-            list-style: none;
-        }
-
-        .suggestions li {
-            padding: 8px 0;
-            padding-left: 24px;
-            position: relative;
-            color: #666;
-        }
-
-        .suggestions li:before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: #10b981;
-            font-weight: bold;
-        }
-
-        .alternatives {
-            background: #eff6ff;
-            border-left: 4px solid #3b82f6;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .alternatives h4 {
-            color: #3b82f6;
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-
-        .bank-info-box {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-
-        .bank-info-box h4 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .bank-info-box ul {
-            list-style: none;
-            font-size: 13px;
-            color: #666;
-        }
-
-        .bank-info-box li {
-            padding: 4px 0;
-            padding-left: 16px;
-            position: relative;
-        }
-
-        .bank-info-box li:before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: #667eea;
-        }
-
-        .warning-box {
-            background: #fff7ed;
-            border-left: 4px solid #f59e0b;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .warning-box strong {
-            color: #f59e0b;
-        }
+        .detail-item { background: #f7f6f1; padding: 12px; border-radius: 8px; }
+        .detail-label { font-size: 11.5px; color: var(--cinza); margin-bottom: 4px; }
+        .detail-value { font-size: 16px; font-weight: 600; color: var(--terra-escuro); }
+        .detail-value.destaque { color: var(--terra-medio); }
+        .detail-value.verde { color: var(--aprovado); }
 
         .approval-notice {
-            background: #ecfdf5;
-            border: 2px solid #10b981;
+            background: #f7f6f1;
+            border: 1px solid var(--cinza-claro);
             border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
+            padding: 14px;
+            margin-top: 14px;
         }
+        .approval-notice h5 { color: var(--terra-medio); margin-bottom: 6px; font-size: 14px; }
+        .approval-notice p { color: var(--terra-escuro); font-size: 12.5px; line-height: 1.5; }
 
-        .approval-notice h5 {
-            color: #059669;
-            margin-bottom: 8px;
+        .bank-info-box { background: #f7f6f1; border-radius: 8px; padding: 14px; margin-top: 14px; }
+        .bank-info-box h4 { color: var(--terra-medio); margin-bottom: 8px; font-size: 13px; letter-spacing: 0.5px; }
+        .bank-info-box ul { list-style: none; font-size: 12.5px; color: var(--terra-escuro); }
+        .bank-info-box li { padding: 3px 0 3px 14px; position: relative; }
+        .bank-info-box li:before { content: "•"; position: absolute; left: 0; color: var(--cinza); }
+
+        .warning-box { background: #f7f6f1; border-left: 4px solid var(--terra-medio); padding: 14px; border-radius: 8px; margin-top: 14px; font-size: 13px; }
+        .warning-box strong { color: var(--terra-medio); }
+
+        .rejection-details { background: #faf6f6; border-left: 4px solid var(--reprovado); padding: 18px; border-radius: 8px; margin-top: 18px; }
+        .rejection-details h4 { color: var(--reprovado); margin-bottom: 12px; font-size: 15px; }
+        .rejection-details ul { list-style: none; }
+        .rejection-details li { padding: 6px 0 6px 22px; position: relative; color: var(--terra-escuro); font-size: 13.5px; }
+        .rejection-details li:before { content: "✗"; position: absolute; left: 0; color: var(--reprovado); font-weight: bold; }
+
+        .suggestions { background: #f5f7f3; border-left: 4px solid var(--aprovado); padding: 18px; border-radius: 8px; margin-top: 14px; }
+        .suggestions h4 { color: var(--aprovado); margin-bottom: 12px; font-size: 15px; }
+        .suggestions ul { list-style: none; }
+        .suggestions li { padding: 6px 0 6px 22px; position: relative; color: var(--terra-escuro); font-size: 13.5px; }
+        .suggestions li:before { content: "→"; position: absolute; left: 0; color: var(--aprovado); font-weight: bold; }
+
+        .alternatives { background: #f7f6f1; border-left: 4px solid var(--cinza); padding: 18px; border-radius: 8px; margin-top: 14px; }
+        .alternatives h4 { color: var(--terra-medio); margin-bottom: 12px; font-size: 15px; }
+        .alternatives ul { list-style: none; }
+        .alternatives li { padding: 6px 0 6px 22px; position: relative; color: var(--terra-escuro); font-size: 13.5px; }
+        .alternatives li:before { content: "•"; position: absolute; left: 6px; color: var(--terra-medio); }
+
+        /* ---------- WHATSAPP BUTTON ---------- */
+        .btn-whatsapp {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #25D366;
+            color: #fff;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 16px;
+            transition: all 0.2s ease;
+        }
+        .btn-whatsapp:hover { background: #1da851; transform: translateY(-2px); }
+        .btn-whatsapp svg { width: 20px; height: 20px; fill: #fff; }
+
+        /* ---------- MODAL DE LIBERAÇÃO (LEAD) ---------- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(16, 16, 16, 0.78);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal-box {
+            background: var(--branco);
+            border-radius: 16px;
+            padding: 34px 30px;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            animation: modalIn 0.25s ease;
+        }
+        @keyframes modalIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+        .modal-tag {
+            display: inline-block;
+            background: var(--cinza-claro);
+            color: var(--terra-medio);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 14px;
+        }
+        .modal-box h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--terra-escuro);
+            margin-bottom: 10px;
+        }
+        .modal-box > p {
             font-size: 14px;
+            color: var(--terra-escuro);
+            line-height: 1.6;
+            margin-bottom: 22px;
+        }
+        .modal-box strong { color: var(--terra-medio); }
+        .modal-error {
+            color: var(--reprovado);
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+            min-height: 0;
+        }
+        .modal-cancel {
+            background: none;
+            border: none;
+            color: var(--cinza);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13.5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 12px;
+            text-decoration: underline;
+        }
+        .modal-cancel:hover { color: var(--terra-medio); }
+        .modal-privacy {
+            font-size: 11.5px;
+            color: var(--cinza);
+            text-align: center;
+            margin-top: 16px;
+            line-height: 1.4;
         }
 
-        .approval-notice p {
-            color: #047857;
-            font-size: 13px;
-            line-height: 1.5;
+        .footer {
+            text-align: center;
+            padding: 26px;
+            background: var(--preto);
+            color: var(--cinza);
+            font-size: 12.5px;
         }
+        .footer .nome {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            color: var(--branco);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .footer a { color: var(--cinza-claro); text-decoration: none; }
 
         @media (max-width: 768px) {
-            .mode-selector {
-                flex-direction: column;
-            }
-
-            .mode-btn {
-                min-width: 100%;
-            }
-
-            .bank-details {
-                grid-template-columns: 1fr;
-            }
+            .mode-selector { flex-direction: column; }
+            .mode-btn { min-width: 100%; }
+            .bank-details { grid-template-columns: 1fr 1fr; }
+            .logo-name { font-size: 36px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <div class="logo-name">Cal Oliveiras</div>
+            <div class="logo-sub">Corretor Particular</div>
+            <span class="logo-creci">CRECI 39020F · Brusque/SC</span>
             <h1>Calculadora de Financiamento Imobiliário</h1>
-            <p>Dados Verificados - Maio 2026 | 10 Instituições Financeiras</p>
+            <p class="subtitle">Parâmetros atualizados · Junho 2026 · 10 instituições financeiras</p>
+            <p class="subtitle" style="margin-top:4px; font-size:12px;">Última verificação dos bancos: <span id="dataVerificacao">11/06/2026</span></p>
         </div>
 
         <div class="content">
             <div class="mode-selector">
                 <div class="mode-btn active" data-mode="inteligente">
                     <h3>Inteligente</h3>
-                    <p>Sugere TOP 3 melhores opções</p>
+                    <p>Sugere as 3 melhores opções</p>
                 </div>
                 <div class="mode-btn" data-mode="todos">
                     <h3>Comparar Todos</h3>
@@ -476,23 +558,35 @@
             </div>
 
             <div class="form-section">
+                <h3>Tipo do Imóvel</h3>
+                <div class="tipo-toggle" id="tipoToggle">
+                    <div class="tipo-option active" data-tipo="novo">
+                        Imóvel Novo
+                        <small>Financia até 90% · MCMV todas as faixas</small>
+                    </div>
+                    <div class="tipo-option" data-tipo="usado">
+                        Imóvel Usado
+                        <small>Financia até 80% (entrada mín. 20%) · MCMV disponível</small>
+                    </div>
+                </div>
+
                 <h3>Dados do Financiamento</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Valor do Imóvel (R$)</label>
-                        <input type="text" id="valorImovel" placeholder="R$ 600.000,00" value="600000">
+                        <label>Valor do Imóvel</label>
+                        <input type="text" id="valorImovel" inputmode="numeric" placeholder="R$ 350.000" value="R$ 350.000">
                     </div>
                     <div class="form-group">
-                        <label>Entrada (R$)</label>
-                        <input type="text" id="entrada" placeholder="R$ 120.000,00" value="120000">
+                        <label>Entrada</label>
+                        <input type="text" id="entrada" inputmode="numeric" placeholder="R$ 70.000" value="R$ 70.000">
                     </div>
                     <div class="form-group">
-                        <label>FGTS Disponível (R$)</label>
-                        <input type="text" id="fgts" placeholder="R$ 20.000,00" value="20000">
+                        <label>FGTS Disponível</label>
+                        <input type="text" id="fgts" inputmode="numeric" placeholder="R$ 20.000" value="R$ 20.000">
                     </div>
                     <div class="form-group">
-                        <label>Renda Mensal Bruta (R$)</label>
-                        <input type="text" id="renda" placeholder="R$ 13.000,00" value="13000">
+                        <label>Renda Mensal Bruta</label>
+                        <input type="text" id="renda" inputmode="numeric" placeholder="R$ 8.000" value="R$ 8.000">
                     </div>
                     <div class="form-group">
                         <label>Prazo (meses)</label>
@@ -507,7 +601,7 @@
                     </div>
                 </div>
 
-                <div id="bancoEspecificoContainer" style="display: none; margin-top: 20px;">
+                <div id="bancoEspecificoContainer" style="display: none; margin-top: 18px;">
                     <div class="form-group">
                         <label>Selecione o Banco</label>
                         <select id="bancoEspecifico">
@@ -526,325 +620,366 @@
                     </div>
                 </div>
 
-                <button class="btn" onclick="calcular()">Calcular Financiamento</button>
+                <button class="btn" onclick="calcular()">Simular Financiamento</button>
             </div>
 
             <div id="results" class="results"></div>
         </div>
+
+        <div class="footer">
+            <span class="nome">Cal Oliveiras</span>
+            Corretor Particular · CRECI 39020F · Brusque/SC<br>
+            <a href="https://wa.me/5547999001754" target="_blank">WhatsApp: (47) 99900-1754</a>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE LIBERAÇÃO (LEAD) ===== -->
+    <div class="modal-overlay" id="leadModal">
+        <div class="modal-box">
+            <span class="modal-tag">Falta só um passo</span>
+            <h3>Sua simulação está pronta!</h3>
+            <p>Informe seu <strong>nome</strong> e <strong>WhatsApp</strong> para liberar o resultado. O Cal usa esses dados para te ajudar a conseguir as melhores condições de financiamento.</p>
+            <div class="form-group">
+                <label>Seu Nome</label>
+                <input type="text" id="nome" placeholder="Como você se chama?">
+            </div>
+            <div class="form-group" style="margin-top:14px;">
+                <label>Seu WhatsApp</label>
+                <input type="text" id="telefone" inputmode="numeric" placeholder="(47) 99999-9999">
+            </div>
+            <div class="modal-error" id="leadError"></div>
+            <button class="btn" style="margin-top:18px;" onclick="liberarSimulacao()">Ver minha simulação</button>
+            <button class="modal-cancel" onclick="fecharLeadModal()">Voltar e revisar os dados</button>
+            <p class="modal-privacy">Seus dados não são armazenados em servidor — são usados apenas para falar com o Cal pelo WhatsApp.</p>
+        </div>
     </div>
 
     <script>
+        const WHATSAPP_CAL = '5547999001754';
+
+        // Parâmetros MCMV — vigentes em junho/2026 (reforma 2026, aceita imóvel novo e usado)
+        const MCMV_FAIXAS = [
+            { faixa: 1, rendaMax: 2850,  tetoImovel: 264000, subsidio: 'Subsídio direto do governo' },
+            { faixa: 2, rendaMax: 4700,  tetoImovel: 264000, subsidio: 'Subsídio direto do governo' },
+            { faixa: 3, rendaMax: 8600,  tetoImovel: 400000, subsidio: 'Sem subsídio, mas com taxas reduzidas' },
+            { faixa: 4, rendaMax: 13000, tetoImovel: 600000, subsidio: 'Classe média — novidade 2026 (entrada mín. 20%)' }
+        ];
+
+        // Teto do SFH elevado para R$ 2,25 milhões pelo CMN em 2026 (uso de FGTS até esse valor)
+        const TETO_SFH = 2250000;
+
+        // ltvNovo / ltvUsado refletem a distinção novo x usado do briefing
         const BANCOS = {
             CAIXA: {
-                nome: 'Caixa Econômica Federal',
-                taxa: 11.19,
-                ltv: 80,
-                prazoMax: 420,
-                limiteMax: 2250000,
-                mcmv: true,
-                renda_min: 0,
+                nome: 'Caixa Econômica Federal', taxa: 11.19, ltvNovo: 90, ltvUsado: 80,
+                prazoMax: 420, limiteMax: 2250000, mcmv: true, renda_min: 0,
                 detalhes: {
                     tipo_taxa: 'TR',
-                    mcmv_info: 'Principal operador MCMV - Faixa 1: 4,00-4,25% | Faixa 2: 4,75-7,00% | Faixa 3: 8,16% | Faixa 4: 10,50%',
-                    ltv_mcmv: 'MCMV Novos: 80% | MCMV Usados F1-2: 80% | F3: 65% | F4: 60% (Sul/Sudeste) ou 80%',
-                    diferenciais: 'Menor taxa do mercado, líder MCMV, aceita FGTS'
+                    mcmv_info: 'Principal operador MCMV — F1: 4,00-4,25% | F2: 4,75-7,00% | F3: 8,16% | F4: 10,00%',
+                    diferenciais: 'Menor taxa do mercado, líder MCMV, aceita FGTS (imóveis até R$ 2,25 mi)'
                 }
             },
             BRB: {
-                nome: 'BRB - Banco de Brasília',
-                taxa: 11.36,
-                ltv: 80,
-                prazoMax: 420,
-                limiteMax: 2250000,
-                mcmv: false,
-                renda_min: 0,
-                detalhes: {
-                    tipo_taxa: 'TR',
-                    mcmv_info: 'Não confirmado',
-                    diferenciais: '2ª menor taxa do mercado, banco público regional (DF + 11 estados)'
-                }
+                nome: 'BRB - Banco de Brasília', taxa: 11.36, ltvNovo: 80, ltvUsado: 80,
+                prazoMax: 420, limiteMax: 2250000, mcmv: false, renda_min: 0,
+                detalhes: { tipo_taxa: 'TR', mcmv_info: 'Não confirmado', diferenciais: '2ª menor taxa do mercado, banco público regional' }
             },
             ITAU: {
-                nome: 'Itaú Unibanco',
-                taxa: 11.60,
-                ltv: 80,
-                prazoMax: 420,
-                limiteMax: 2000000,
-                mcmv: false,
-                renda_min: 0,
-                detalhes: {
-                    tipo_taxa: 'TR',
-                    mcmv_info: 'NÃO opera ainda (previsão 2º semestre 2026, focará Faixa 4)',
-                    diferenciais: 'Aprovação digital rápida (horas), taxa reduzida em dez/2025 de 11,70%'
-                }
+                nome: 'Itaú Unibanco', taxa: 11.60, ltvNovo: 90, ltvUsado: 80,
+                prazoMax: 420, limiteMax: 2250000, mcmv: false, renda_min: 0,
+                detalhes: { tipo_taxa: 'TR', mcmv_info: 'Previsão 2º semestre 2026 (foco Faixa 4)', diferenciais: 'Aprovação digital rápida' }
             },
             BRADESCO: {
-                nome: 'Bradesco',
-                taxa: 11.70,
-                ltv: 80,
-                prazoMax: 420,
-                limiteMax: 2000000,
-                mcmv: false,
-                renda_min: 0,
-                detalhes: {
-                    tipo_taxa: 'TR ou Poupança Mais',
-                    mcmv_info: 'Não confirmado',
-                    diferenciais: 'Pula Parcela (1x/ano), financia até 5% custos cartório, LTV 70% comercial'
-                }
+                nome: 'Bradesco', taxa: 11.70, ltvNovo: 80, ltvUsado: 80,
+                prazoMax: 420, limiteMax: 2250000, mcmv: false, renda_min: 0,
+                detalhes: { tipo_taxa: 'TR ou Poupança Mais', mcmv_info: 'Não confirmado', diferenciais: 'Pula Parcela (1x/ano), financia custos de cartório' }
             },
             SANTANDER: {
-                nome: 'Santander',
-                taxa: 11.79,
-                ltv: 80,
-                prazoMax: 420,
-                limiteMax: 2000000,
-                mcmv: false,
-                renda_min: 0,
-                detalhes: {
-                    tipo_taxa: 'TR',
-                    mcmv_info: 'Não confirmado',
-                    diferenciais: 'Composição renda até 3 pessoas SEM vínculo familiar, financia ITBI/Registro, taxa reduzida de 11,99%'
-                }
+                nome: 'Santander', taxa: 11.79, ltvNovo: 80, ltvUsado: 80,
+                prazoMax: 420, limiteMax: 2250000, mcmv: false, renda_min: 0,
+                detalhes: { tipo_taxa: 'TR', mcmv_info: 'Não confirmado', diferenciais: 'Composição de renda até 3 pessoas sem vínculo familiar' }
             },
             BB: {
-                nome: 'Banco do Brasil',
-                taxa: 12.00,
-                ltv: 80,
-                prazoMax: 420,
-                limiteMax: 5000000,
-                mcmv: true,
-                renda_min: 20000,
-                detalhes: {
-                    tipo_taxa: 'TR',
-                    taxa_pro_cotista: '9,00% a.a. + TR (com FGTS)',
-                    mcmv_info: 'Participa do MCMV',
-                    diferenciais: 'Pró-Cotista 9% a.a., limite até R$5mi'
-                }
+                nome: 'Banco do Brasil', taxa: 12.00, ltvNovo: 90, ltvUsado: 80,
+                prazoMax: 420, limiteMax: 2250000, mcmv: true, renda_min: 0,
+                detalhes: { tipo_taxa: 'TR', taxa_pro_cotista: '9,00% a.a. + TR (com FGTS)', mcmv_info: 'Participa do MCMV', diferenciais: 'Pró-Cotista 9% a.a.' }
             },
             INTER: {
-                nome: 'Banco Inter',
-                taxa: 13.76,
-                ltv: 75,
-                prazoMax: 360,
-                limiteMax: 2000000,
-                mcmv: false,
-                renda_min: 0,
+                nome: 'Banco Inter', taxa: 13.76, ltvNovo: 80, ltvUsado: 70,
+                prazoMax: 360, limiteMax: 2250000, mcmv: false, renda_min: 0,
                 detalhes: {
-                    tipo_taxa: 'IPCA',
-                    taxa_alternativa: '9,5% a.a. + IPCA',
-                    mcmv_info: 'Não confirmado',
-                    diferenciais: '100% digital, ATENÇÃO: taxa indexada ao IPCA (maior risco inflacionário)',
-                    aviso: 'Taxa IPCA pode variar significativamente com inflação!'
+                    tipo_taxa: 'IPCA', taxa_alternativa: '9,5% a.a. + IPCA', mcmv_info: 'Não confirmado',
+                    diferenciais: '100% digital', aviso: 'Taxa indexada ao IPCA pode variar muito com a inflação!'
                 }
             },
             SICREDI: {
-                nome: 'Sicredi',
-                taxa: 7.50,
-                ltv: 90,
-                prazoMax: 420,
-                limiteMax: 1500000,
-                mcmv: true,
-                renda_min: 0,
-                detalhes: {
-                    tipo_taxa: 'Varia por cooperativa',
-                    mcmv_info: 'Participa do MCMV',
-                    diferenciais: 'Cooperativa (necessário ser associado), LTV 90%, crescimento 42% em 2026'
-                }
+                nome: 'Sicredi', taxa: 10.50, ltvNovo: 90, ltvUsado: 80,
+                prazoMax: 420, limiteMax: 1500000, mcmv: true, renda_min: 0,
+                detalhes: { tipo_taxa: 'Varia por cooperativa', mcmv_info: 'Participa do MCMV', diferenciais: 'Cooperativa (necessário ser associado), LTV até 90%' }
             },
             SICOOB: {
-                nome: 'Sicoob',
-                taxa: 7.50,
-                ltv: 80,
-                prazoMax: 420,
-                limiteMax: 1500000,
-                mcmv: true,
-                renda_min: 0,
-                detalhes: {
-                    tipo_taxa: 'Varia por cooperativa',
-                    mcmv_info: 'Participa do MCMV',
-                    ltv_pro_cotista: 'Pró-Cotista SAC: até 90%',
-                    diferenciais: 'Cooperativa (necessário ser associado), composição renda até 3 pessoas'
-                }
+                nome: 'Sicoob', taxa: 10.50, ltvNovo: 90, ltvUsado: 80,
+                prazoMax: 420, limiteMax: 1500000, mcmv: true, renda_min: 0,
+                detalhes: { tipo_taxa: 'Varia por cooperativa', mcmv_info: 'Participa do MCMV', ltv_pro_cotista: 'Pró-Cotista SAC: até 90%', diferenciais: 'Cooperativa, composição de renda até 3 pessoas' }
             },
             VIACREDI: {
-                nome: 'Viacredi (Ailos)',
-                taxa: 6.20,
-                ltv: 90,
-                prazoMax: 420,
-                limiteMax: 350000,
-                mcmv: true,
-                renda_min: 0,
+                nome: 'Viacredi (Ailos)', taxa: 10.20, ltvNovo: 90, ltvUsado: 70,
+                prazoMax: 420, limiteMax: 350000, mcmv: true, renda_min: 0,
                 detalhes: {
-                    tipo_taxa: 'TR',
-                    taxa_mcmv: '4,25-8,16% a.a. + TR (varia por faixa MCMV)',
-                    taxa_pro_cotista: '8,66% a.a. + TR (renda >R$8.600)',
-                    mcmv_info: 'SOMENTE IMÓVEIS NOVOS no limite MCMV',
-                    ltv_detalhes: 'Novos MCMV: 90% (até R$350k) | Usados renda R$2.160-4.700: 90% | Usados renda R$4.700-8.600: 65% (max R$270k)',
-                    diferenciais: 'Cooperativa Ailos, crescimento 47% em 2025, projeção R$200mi MCMV em 2026'
+                    tipo_taxa: 'TR', taxa_mcmv: '4,25-8,16% a.a. + TR (varia por faixa)',
+                    mcmv_info: 'Foco em imóveis novos no limite MCMV',
+                    diferenciais: 'Cooperativa Ailos'
                 }
             }
         };
 
         let modoAtual = 'inteligente';
+        let tipoImovel = 'novo';
+        let ultimaSimulacao = null;
+        let leadCapturado = false;
+        const resultadosCache = {};
 
+        /* ============ MÁSCARA DE MOEDA (corrigida) ============ */
+        // Aceita apenas dígitos, formata em R$ com separador de milhar,
+        // cursor sempre no final, sem comportamento errático.
         function aplicarMascaraDinheiro(input) {
-            let valor = input.value.replace(/\D/g, '');
-            valor = (parseInt(valor) / 100).toFixed(2);
-            valor = valor.replace('.', ',');
-            valor = valor.replace(/(\d)(?=(\d{3})+\,)/g, '$1.');
-            input.value = valor;
+            let digitos = input.value.replace(/\D/g, '');
+            digitos = digitos.replace(/^0+/, '');
+            if (digitos === '') { input.value = ''; return; }
+            const numero = parseInt(digitos, 10);
+            input.value = 'R$ ' + numero.toLocaleString('pt-BR');
         }
 
         function removerMascara(valor) {
             if (!valor) return 0;
-            return parseFloat(valor.toString().replace(/\./g, '').replace(',', '.')) || 0;
+            const digitos = valor.toString().replace(/\D/g, '');
+            return digitos === '' ? 0 : parseInt(digitos, 10);
         }
 
-        document.getElementById('valorImovel').addEventListener('blur', function() {
-            aplicarMascaraDinheiro(this);
-        });
-        document.getElementById('entrada').addEventListener('blur', function() {
-            aplicarMascaraDinheiro(this);
-        });
-        document.getElementById('fgts').addEventListener('blur', function() {
-            aplicarMascaraDinheiro(this);
-        });
-        document.getElementById('renda').addEventListener('blur', function() {
-            aplicarMascaraDinheiro(this);
+        ['valorImovel', 'entrada', 'fgts', 'renda'].forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('input', function () { aplicarMascaraDinheiro(this); });
         });
 
-        document.querySelectorAll('.mode-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        /* ============ MÁSCARA DE TELEFONE ============ */
+        function aplicarMascaraTelefone(input) {
+            let d = input.value.replace(/\D/g, '').slice(0, 11);
+            if (d.length === 0) { input.value = ''; return; }
+            if (d.length <= 2) input.value = '(' + d;
+            else if (d.length <= 6) input.value = '(' + d.slice(0, 2) + ') ' + d.slice(2);
+            else if (d.length <= 10) input.value = '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6);
+            else input.value = '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
+        }
+        document.getElementById('telefone').addEventListener('input', function () { aplicarMascaraTelefone(this); });
+
+        /* ============ TOGGLE NOVO / USADO ============ */
+        document.querySelectorAll('.tipo-option').forEach(opt => {
+            opt.addEventListener('click', function () {
+                document.querySelectorAll('.tipo-option').forEach(o => o.classList.remove('active'));
                 this.classList.add('active');
-                modoAtual = this.dataset.mode;
-                
-                const bancoContainer = document.getElementById('bancoEspecificoContainer');
-                if (modoAtual === 'especifico') {
-                    bancoContainer.style.display = 'block';
-                } else {
-                    bancoContainer.style.display = 'none';
-                }
+                tipoImovel = this.dataset.tipo;
             });
         });
 
+        /* ============ SELETOR DE MODO ============ */
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                modoAtual = this.dataset.mode;
+                document.getElementById('bancoEspecificoContainer').style.display =
+                    (modoAtual === 'especifico') ? 'block' : 'none';
+            });
+        });
+
+        /* ============ MCMV ============ */
+        function avaliarMCMV(renda, valorImovel, tipo) {
+            // Retorna a faixa elegível (a primeira em que renda e teto cabem), ou null.
+            // Em 2026 o MCMV aceita imóvel novo e usado em todas as faixas.
+            for (const f of MCMV_FAIXAS) {
+                if (renda <= f.rendaMax && valorImovel <= f.tetoImovel) {
+                    return f;
+                }
+            }
+            return null;
+        }
+
+        function renderMCMVBanner(renda, valorImovel, tipo) {
+            const faixa = avaliarMCMV(renda, valorImovel, tipo);
+
+            if (!faixa) {
+                let motivo;
+                if (valorImovel > 600000) {
+                    motivo = 'O valor do imóvel (R$ ' + formatMoney(valorImovel) + ') está acima do teto do MCMV (R$ 600.000 na Faixa 4).';
+                } else {
+                    motivo = 'Com a renda informada (R$ ' + formatMoney(renda) + ') o financiamento segue pelas regras SFH/SBPE, fora do programa MCMV.';
+                }
+                return '<div class="mcmv-banner indisponivel">' +
+                    '<h4>MCMV — Minha Casa Minha Vida</h4>' +
+                    '<p>' + motivo + ' Mesmo assim, há boas condições nas carteiras tradicionais abaixo.</p>' +
+                    '</div>';
+            }
+
+            const destaqueF4 = faixa.faixa === 4;
+            let extra = '';
+            if (destaqueF4) {
+                extra = '<p style="margin-top:10px;"><strong>Novidade 2026:</strong> a Faixa 4 incluiu a <strong>classe média</strong> no programa — renda até R$ 13.000 e imóveis de até R$ 600.000 com taxas reduzidas.</p>';
+            }
+
+            return '<div class="mcmv-banner ' + (destaqueF4 ? 'destaque-f4' : '') + '">' +
+                '<span class="faixa-tag">MCMV · Faixa ' + faixa.faixa + '</span>' +
+                '<h4>Você se enquadra no Minha Casa Minha Vida</h4>' +
+                '<p><strong>Renda até R$ ' + formatMoney(faixa.rendaMax) + '/mês</strong> · ' +
+                'Teto do imóvel: <strong>R$ ' + formatMoney(faixa.tetoImovel) + '</strong><br>' +
+                faixa.subsidio + ' · Imóvel <strong>' + (tipo === 'novo' ? 'novo' : 'usado') + '</strong></p>' +
+                extra +
+                '</div>';
+        }
+
+        /* ============ GATE DE LEAD + CÁLCULO PRINCIPAL ============ */
+        // Clique em "Simular": valida os dados e, se o lead ainda não foi informado,
+        // abre o modal exigindo nome e WhatsApp antes de liberar o resultado.
         function calcular() {
+            const valorImovel = removerMascara(document.getElementById('valorImovel').value);
+            const renda = removerMascara(document.getElementById('renda').value);
+
+            if (valorImovel <= 0 || renda <= 0) {
+                alert('Por favor, preencha ao menos o valor do imóvel e a renda!');
+                return;
+            }
+            if (modoAtual === 'especifico' && !document.getElementById('bancoEspecifico').value) {
+                alert('Por favor, selecione um banco!');
+                return;
+            }
+
+            if (!leadCapturado) {
+                abrirLeadModal();
+                return;
+            }
+            executarSimulacao();
+        }
+
+        function abrirLeadModal() {
+            document.getElementById('leadError').textContent = '';
+            document.getElementById('leadModal').classList.add('active');
+            document.getElementById('nome').focus();
+        }
+
+        function fecharLeadModal() {
+            document.getElementById('leadModal').classList.remove('active');
+        }
+
+        // Valida nome + WhatsApp e libera a visualização da simulação
+        function liberarSimulacao() {
+            const nome = document.getElementById('nome').value.trim();
+            const telDigitos = document.getElementById('telefone').value.replace(/\D/g, '');
+            const erro = document.getElementById('leadError');
+
+            if (nome.length < 2) {
+                erro.textContent = 'Por favor, informe seu nome.';
+                document.getElementById('nome').focus();
+                return;
+            }
+            if (telDigitos.length < 10) {
+                erro.textContent = 'Informe um WhatsApp válido com DDD, ex: (47) 99999-9999.';
+                document.getElementById('telefone').focus();
+                return;
+            }
+
+            erro.textContent = '';
+            leadCapturado = true;
+            fecharLeadModal();
+            executarSimulacao();
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function executarSimulacao() {
             const valorImovel = removerMascara(document.getElementById('valorImovel').value);
             const entrada = removerMascara(document.getElementById('entrada').value);
             const fgts = removerMascara(document.getElementById('fgts').value);
             const renda = removerMascara(document.getElementById('renda').value);
             const prazo = parseInt(document.getElementById('prazo').value) || 360;
             const sistema = document.getElementById('sistema').value;
-
-            if (valorImovel <= 0 || renda <= 0) {
-                alert('Por favor, preencha todos os campos obrigatórios!');
-                return;
-            }
-
             const entradaTotal = entrada + fgts;
 
+            ultimaSimulacao = { valorImovel, entrada, fgts, renda, prazo, sistema, tipo: tipoImovel };
+
+            let html = renderMCMVBanner(renda, valorImovel, tipoImovel);
+
             if (modoAtual === 'inteligente') {
-                calcularInteligente(valorImovel, entradaTotal, renda, prazo, sistema);
+                html += calcularInteligente(valorImovel, entradaTotal, renda, prazo, sistema);
             } else if (modoAtual === 'todos') {
-                calcularTodos(valorImovel, entradaTotal, renda, prazo, sistema);
+                html += calcularTodos(valorImovel, entradaTotal, renda, prazo, sistema);
             } else {
-                calcularEspecifico(valorImovel, entradaTotal, renda, prazo, sistema);
+                const r = calcularEspecifico(valorImovel, entradaTotal, renda, prazo, sistema);
+                if (r === null) return;
+                html += r;
             }
+
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function disclaimerHTML() {
+            return '<div class="info-disclaimer">' +
+                '<h4>Leia antes de consultar os bancos</h4>' +
+                '<p>Esta simulação utiliza os <strong>critérios máximos públicos</strong> de cada banco para imóvel ' +
+                '<strong>' + (tipoImovel === 'novo' ? 'novo' : 'usado') + '</strong>. Na prática, o percentual aprovado pode ser menor conforme:</p>' +
+                '<ul>' +
+                '<li><strong>Score de crédito</strong> e histórico de pagamentos</li>' +
+                '<li><strong>Relacionamento bancário</strong> e movimentação financeira</li>' +
+                '<li><strong>Dívidas existentes</strong> e outros compromissos</li>' +
+                '<li><strong>Perfil de risco</strong> avaliado por cada instituição</li>' +
+                '</ul>' +
+                '<p><strong>Recomendação:</strong> use como referência inicial e confirme as condições reais diretamente com o Cal.</p>' +
+                '</div>';
         }
 
         function calcularInteligente(valorImovel, entradaTotal, renda, prazo, sistema) {
             const resultados = simularTodosBancos(valorImovel, entradaTotal, renda, prazo, sistema);
             const aprovados = resultados.filter(r => r.aprovado).slice(0, 3);
 
-            let html = '<div class="info-disclaimer">';
-            html += '<h4>IMPORTANTE - LEIA ANTES DE CONSULTAR OS BANCOS</h4>';
-            html += '<p>Esta simulação utiliza os <strong>critérios máximos públicos</strong> de cada banco (LTV 80-90%). Na prática, o percentual aprovado pode ser menor baseado em:</p>';
-            html += '<ul>';
-            html += '<li><strong>Score de crédito:</strong> Histórico de pagamentos e inadimplência</li>';
-            html += '<li><strong>Análise bancária:</strong> Relacionamento com o banco e movimentação financeira</li>';
-            html += '<li><strong>Dívidas existentes:</strong> Outros financiamentos e compromissos financeiros</li>';
-            html += '<li><strong>Perfil de risco:</strong> Avaliação individual de cada instituição</li>';
-            html += '</ul>';
-            html += '<p><strong>Recomendação:</strong> Use esta simulação como referência inicial. Sempre consulte diretamente o banco para confirmação dos valores e condições reais de aprovação.</p>';
-            html += '</div>';
-
-            html += '<h2 style="margin-bottom: 20px;">TOP 3 Melhores Opções para Você</h2>';
+            let html = disclaimerHTML();
+            html += '<h2 class="results-title">As 3 melhores opções para você</h2>';
 
             if (aprovados.length === 0) {
-                html += '<div class="bank-card rejected"><h3>Nenhum banco aprovou com as condições informadas</h3>';
-                html += '<p style="margin-top: 10px;">Veja os motivos abaixo e ajuste sua simulação.</p></div>';
-                
+                html += '<div class="bank-card rejected"><div class="bank-name">Nenhum banco aprovou com as condições informadas</div>';
+                html += '<p style="margin-top:10px;color:var(--cinza);">Veja os motivos abaixo e ajuste sua simulação.</p></div>';
                 resultados.slice(0, 3).forEach(res => {
                     html += renderBankCard(res, valorImovel, entradaTotal, renda, prazo, sistema, true);
                 });
             } else {
-                aprovados.forEach((res, index) => {
+                aprovados.forEach(res => {
                     html += renderBankCard(res, valorImovel, entradaTotal, renda, prazo, sistema, false);
                 });
             }
-
-            document.getElementById('results').innerHTML = html;
+            return html;
         }
 
         function calcularTodos(valorImovel, entradaTotal, renda, prazo, sistema) {
             const resultados = simularTodosBancos(valorImovel, entradaTotal, renda, prazo, sistema);
-
-            let html = '<div class="info-disclaimer">';
-            html += '<h4>IMPORTANTE - LEIA ANTES DE CONSULTAR OS BANCOS</h4>';
-            html += '<p>Esta simulação utiliza os <strong>critérios máximos públicos</strong> de cada banco (LTV 80-90%). Na prática, o percentual aprovado pode ser menor baseado em:</p>';
-            html += '<ul>';
-            html += '<li><strong>Score de crédito:</strong> Histórico de pagamentos e inadimplência</li>';
-            html += '<li><strong>Análise bancária:</strong> Relacionamento com o banco e movimentação financeira</li>';
-            html += '<li><strong>Dívidas existentes:</strong> Outros financiamentos e compromissos financeiros</li>';
-            html += '<li><strong>Perfil de risco:</strong> Avaliação individual de cada instituição</li>';
-            html += '</ul>';
-            html += '<p><strong>Recomendação:</strong> Use esta simulação como referência inicial. Sempre consulte diretamente o banco para confirmação dos valores e condições reais de aprovação.</p>';
-            html += '</div>';
-
-            html += '<h2 style="margin-bottom: 20px;">Ranking Completo - 10 Bancos</h2>';
-
+            let html = disclaimerHTML();
+            html += '<h2 class="results-title">Ranking completo — 10 bancos</h2>';
             resultados.forEach(res => {
                 html += renderBankCard(res, valorImovel, entradaTotal, renda, prazo, sistema, true);
             });
-
-            document.getElementById('results').innerHTML = html;
+            return html;
         }
 
         function calcularEspecifico(valorImovel, entradaTotal, renda, prazo, sistema) {
             const bancoSelecionado = document.getElementById('bancoEspecifico').value;
-
-            if (!bancoSelecionado) {
-                alert('Por favor, selecione um banco!');
-                return;
-            }
-
+            if (!bancoSelecionado) { alert('Por favor, selecione um banco!'); return null; }
             const resultado = simularBanco(bancoSelecionado, valorImovel, entradaTotal, renda, prazo, sistema);
-
-            let html = '<div class="info-disclaimer">';
-            html += '<h4>IMPORTANTE - LEIA ANTES DE CONSULTAR O BANCO</h4>';
-            html += '<p>Esta simulação utiliza os <strong>critérios máximos públicos</strong> do banco. Na prática, o percentual aprovado pode ser menor baseado em:</p>';
-            html += '<ul>';
-            html += '<li><strong>Score de crédito:</strong> Histórico de pagamentos e inadimplência</li>';
-            html += '<li><strong>Análise bancária:</strong> Relacionamento com o banco e movimentação financeira</li>';
-            html += '<li><strong>Dívidas existentes:</strong> Outros financiamentos e compromissos financeiros</li>';
-            html += '<li><strong>Perfil de risco:</strong> Avaliação individual da instituição</li>';
-            html += '</ul>';
-            html += '<p><strong>Recomendação:</strong> Use esta simulação como referência inicial. Sempre consulte diretamente o banco para confirmação dos valores e condições reais de aprovação.</p>';
-            html += '</div>';
-
-            html += '<h2 style="margin-bottom: 20px;">Análise Detalhada</h2>';
+            let html = disclaimerHTML();
+            html += '<h2 class="results-title">Análise detalhada</h2>';
             html += renderBankCard(resultado, valorImovel, entradaTotal, renda, prazo, sistema, true);
-
-            document.getElementById('results').innerHTML = html;
+            return html;
         }
 
         function simularTodosBancos(valorImovel, entradaTotal, renda, prazo, sistema) {
             const resultados = [];
-
-            for (const [codigo, banco] of Object.entries(BANCOS)) {
+            for (const codigo of Object.keys(BANCOS)) {
                 resultados.push(simularBanco(codigo, valorImovel, entradaTotal, renda, prazo, sistema));
             }
-
             return resultados.sort((a, b) => {
                 if (a.aprovado && !b.aprovado) return -1;
                 if (!a.aprovado && b.aprovado) return 1;
@@ -855,222 +990,198 @@
 
         function simularBanco(codigo, valorImovel, entradaTotal, renda, prazo, sistema) {
             const banco = BANCOS[codigo];
+            const ltv = (tipoImovel === 'novo') ? banco.ltvNovo : banco.ltvUsado;
             const valorFinanciado = valorImovel - entradaTotal;
             const ltvSolicitado = (valorFinanciado / valorImovel) * 100;
 
             const motivos = [];
             let aprovado = true;
 
-            const entradaNecessaria = valorImovel * (1 - banco.ltv / 100);
+            const entradaNecessaria = valorImovel * (1 - ltv / 100);
             if (entradaTotal < entradaNecessaria) {
                 aprovado = false;
                 const falta = entradaNecessaria - entradaTotal;
-                motivos.push(`Entrada insuficiente: Você tem R$ ${formatMoney(entradaTotal)}, precisa de R$ ${formatMoney(entradaNecessaria)} (faltam R$ ${formatMoney(falta)})`);
+                motivos.push('Entrada insuficiente: você tem R$ ' + formatMoney(entradaTotal) + ', precisa de R$ ' + formatMoney(entradaNecessaria) + ' (faltam R$ ' + formatMoney(falta) + ') para imóvel ' + tipoImovel + ' (LTV ' + ltv + '%)');
             }
 
             if (valorImovel > banco.limiteMax) {
                 aprovado = false;
-                motivos.push(`Valor do imóvel (R$ ${formatMoney(valorImovel)}) excede o limite do banco (R$ ${formatMoney(banco.limiteMax)})`);
+                motivos.push('Valor do imóvel (R$ ' + formatMoney(valorImovel) + ') excede o limite do banco (R$ ' + formatMoney(banco.limiteMax) + ')');
             }
 
             if (prazo > banco.prazoMax) {
                 aprovado = false;
-                motivos.push(`Prazo solicitado (${prazo} meses) excede o máximo do banco (${banco.prazoMax} meses)`);
+                motivos.push('Prazo solicitado (' + prazo + ' meses) excede o máximo do banco (' + banco.prazoMax + ' meses)');
             }
 
             if (banco.renda_min > 0 && renda < banco.renda_min) {
                 aprovado = false;
-                motivos.push(`Renda (R$ ${formatMoney(renda)}) abaixo do mínimo exigido (R$ ${formatMoney(banco.renda_min)})`);
+                motivos.push('Renda (R$ ' + formatMoney(renda) + ') abaixo do mínimo exigido (R$ ' + formatMoney(banco.renda_min) + ')');
             }
 
             const taxaMensal = banco.taxa / 100 / 12;
-            let parcelaInicial = 0;
+            let parcelaInicial = 0, parcelaFinal = 0, totalPago = 0;
 
-            if (sistema === 'SAC') {
-                const amortizacao = valorFinanciado / prazo;
-                const jurosPrimeiraParcela = valorFinanciado * taxaMensal;
-                parcelaInicial = amortizacao + jurosPrimeiraParcela;
-            } else {
-                parcelaInicial = valorFinanciado * (taxaMensal * Math.pow(1 + taxaMensal, prazo)) / (Math.pow(1 + taxaMensal, prazo) - 1);
+            if (valorFinanciado > 0) {
+                if (sistema === 'SAC') {
+                    const amortizacao = valorFinanciado / prazo;
+                    parcelaInicial = amortizacao + valorFinanciado * taxaMensal;
+                    parcelaFinal = amortizacao + amortizacao * taxaMensal;
+                    // total = principal + juros; soma dos saldos = VF*(prazo+1)/2
+                    const totalJuros = taxaMensal * valorFinanciado * (prazo + 1) / 2;
+                    totalPago = valorFinanciado + totalJuros;
+                } else {
+                    parcelaInicial = valorFinanciado * (taxaMensal * Math.pow(1 + taxaMensal, prazo)) / (Math.pow(1 + taxaMensal, prazo) - 1);
+                    parcelaFinal = parcelaInicial;
+                    totalPago = parcelaInicial * prazo;
+                }
             }
 
-            const comprometimento = (parcelaInicial / renda) * 100;
+            const comprometimento = renda > 0 ? (parcelaInicial / renda) * 100 : 0;
             if (comprometimento > 30) {
                 aprovado = false;
-                motivos.push(`Renda comprometida: ${comprometimento.toFixed(1)}% da renda (máximo 30%). Parcela: R$ ${formatMoney(parcelaInicial)}`);
+                motivos.push('Renda comprometida: ' + comprometimento.toFixed(1) + '% da renda (máximo 30%). Parcela: R$ ' + formatMoney(parcelaInicial));
             }
 
             const cetEstimado = banco.taxa + 1.3;
 
-            return {
-                codigo,
-                banco,
-                aprovado,
-                motivos,
-                valorFinanciado,
-                parcelaInicial,
-                ltvSolicitado,
-                comprometimento,
-                entradaNecessaria,
-                cetEstimado
+            const resultado = {
+                codigo, banco, aprovado, motivos, valorFinanciado,
+                parcelaInicial, parcelaFinal, totalPago, ltv,
+                ltvSolicitado, comprometimento, entradaNecessaria, cetEstimado
             };
+            resultadosCache[codigo] = resultado;
+            return resultado;
         }
 
         function renderBankCard(resultado, valorImovel, entradaTotal, renda, prazo, sistema, mostrarDetalhes) {
-            const { codigo, banco, aprovado, motivos, valorFinanciado, parcelaInicial, ltvSolicitado, comprometimento, entradaNecessaria, cetEstimado } = resultado;
+            const { codigo, banco, aprovado, motivos, valorFinanciado, parcelaInicial, parcelaFinal, totalPago, ltv, comprometimento, entradaNecessaria, cetEstimado } = resultado;
 
-            let html = `<div class="bank-card ${aprovado ? 'approved' : 'rejected'}">`;
-            
-            html += `<div class="bank-header">
-                <div class="bank-name">${banco.nome}</div>
-                <div class="status-badge ${aprovado ? 'approved' : 'rejected'}">
-                    ${aprovado ? 'APROVADO' : 'REPROVADO'}
-                </div>
-            </div>`;
+            let html = '<div class="bank-card ' + (aprovado ? 'approved' : 'rejected') + '">';
+            html += '<div class="bank-header">' +
+                '<div class="bank-name">' + banco.nome + '</div>' +
+                '<div class="status-badge ' + (aprovado ? 'approved' : 'rejected') + '">' + (aprovado ? 'APROVADO' : 'REPROVADO') + '</div>' +
+                '</div>';
 
-            html += `<div class="bank-details">
-                <div class="detail-item">
-                    <div class="detail-label">Taxa Nominal</div>
-                    <div class="detail-value">${banco.taxa.toFixed(2)}% a.a. + ${banco.detalhes.tipo_taxa}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">CET (estimado)</div>
-                    <div class="detail-value">${cetEstimado.toFixed(2)}% a.a.</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">LTV Máximo</div>
-                    <div class="detail-value">${banco.ltv}%</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Prazo Máximo</div>
-                    <div class="detail-value">${banco.prazoMax} meses</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Limite Máximo</div>
-                    <div class="detail-value">R$ ${formatMoney(banco.limiteMax)}</div>
-                </div>`;
+            html += '<div class="bank-details">' +
+                '<div class="detail-item"><div class="detail-label">Taxa Nominal</div><div class="detail-value">' + banco.taxa.toFixed(2) + '% a.a. + ' + banco.detalhes.tipo_taxa + '</div></div>' +
+                '<div class="detail-item"><div class="detail-label">CET (estimado)</div><div class="detail-value">' + cetEstimado.toFixed(2) + '% a.a.</div></div>' +
+                '<div class="detail-item"><div class="detail-label">LTV (' + tipoImovel + ')</div><div class="detail-value">' + ltv + '%</div></div>' +
+                '<div class="detail-item"><div class="detail-label">Prazo Máximo</div><div class="detail-value">' + banco.prazoMax + ' meses</div></div>' +
+                '<div class="detail-item"><div class="detail-label">Limite Máximo</div><div class="detail-value">R$ ' + formatMoney(banco.limiteMax) + '</div></div>';
 
             if (aprovado) {
-                html += `<div class="detail-item">
-                    <div class="detail-label">Valor Financiado</div>
-                    <div class="detail-value" style="color: #3b82f6;">R$ ${formatMoney(valorFinanciado)}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Parcela Inicial (${sistema})</div>
-                    <div class="detail-value" style="color: #10b981;">R$ ${formatMoney(parcelaInicial)}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Comprometimento</div>
-                    <div class="detail-value">${comprometimento.toFixed(1)}%</div>
-                </div>`;
+                html += '<div class="detail-item"><div class="detail-label">Valor Financiado</div><div class="detail-value destaque">R$ ' + formatMoney(valorFinanciado) + '</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">1ª Parcela (' + sistema + ')</div><div class="detail-value verde">R$ ' + formatMoney(parcelaInicial) + '</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">Última Parcela</div><div class="detail-value">R$ ' + formatMoney(parcelaFinal) + '</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">Total a Pagar</div><div class="detail-value">R$ ' + formatMoney(totalPago) + '</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">Comprometimento</div><div class="detail-value">' + comprometimento.toFixed(1) + '%</div></div>';
             }
-
-            html += `</div>`;
+            html += '</div>';
 
             if (aprovado) {
-                html += `<div class="approval-notice">
-                    <h5>Atenção: Aprovação baseada em critérios públicos</h5>
-                    <p>O banco poderá aprovar um percentual menor (60-70% ao invés de ${banco.ltv}%) baseado na análise individual de crédito, score e histórico bancário. Consulte diretamente o banco para confirmar o percentual real de aprovação para seu perfil.</p>
-                </div>`;
+                html += '<div class="approval-notice"><h5>Aprovação baseada em critérios públicos</h5>' +
+                    '<p>O banco poderá aprovar um percentual menor que ' + ltv + '% conforme análise individual de crédito, score e histórico. Confirme o percentual real para o seu perfil.</p></div>';
+                // Botão WhatsApp por banco aprovado
+                html += '<button class="btn-whatsapp" onclick="enviarParaCal(\'' + codigo + '\')">' +
+                    '<svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.8-2.8-1.5-3.9-3.4-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 1.9.8 2.6.9 3.5.8.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"/></svg>' +
+                    'Enviar essa simulação para o Cal</button>';
             }
 
             if (mostrarDetalhes) {
-                html += `<div class="bank-info-box">
-                    <h4>INFORMAÇÕES DO ${banco.nome.toUpperCase()}</h4>
-                    <ul>`;
-                
-                if (banco.detalhes.taxa_mcmv) {
-                    html += `<li>Taxa MCMV: ${banco.detalhes.taxa_mcmv}</li>`;
-                }
-                if (banco.detalhes.taxa_pro_cotista) {
-                    html += `<li>Pró-Cotista: ${banco.detalhes.taxa_pro_cotista}</li>`;
-                }
-                if (banco.detalhes.taxa_alternativa) {
-                    html += `<li>Taxa Alternativa: ${banco.detalhes.taxa_alternativa}</li>`;
-                }
-                html += `<li>MCMV: ${banco.detalhes.mcmv_info}</li>`;
-                if (banco.detalhes.ltv_mcmv) {
-                    html += `<li>LTV MCMV: ${banco.detalhes.ltv_mcmv}</li>`;
-                }
-                if (banco.detalhes.ltv_detalhes) {
-                    html += `<li>${banco.detalhes.ltv_detalhes}</li>`;
-                }
-                if (banco.detalhes.ltv_pro_cotista) {
-                    html += `<li>${banco.detalhes.ltv_pro_cotista}</li>`;
-                }
-                html += `<li>Diferenciais: ${banco.detalhes.diferenciais}</li>`;
-                
-                html += `</ul></div>`;
+                html += '<div class="bank-info-box"><h4>SOBRE O ' + banco.nome.toUpperCase() + '</h4><ul>';
+                if (banco.detalhes.taxa_mcmv) html += '<li>Taxa MCMV: ' + banco.detalhes.taxa_mcmv + '</li>';
+                if (banco.detalhes.taxa_pro_cotista) html += '<li>Pró-Cotista: ' + banco.detalhes.taxa_pro_cotista + '</li>';
+                if (banco.detalhes.taxa_alternativa) html += '<li>Taxa Alternativa: ' + banco.detalhes.taxa_alternativa + '</li>';
+                html += '<li>MCMV: ' + banco.detalhes.mcmv_info + '</li>';
+                if (banco.detalhes.ltv_pro_cotista) html += '<li>' + banco.detalhes.ltv_pro_cotista + '</li>';
+                html += '<li>Diferenciais: ' + banco.detalhes.diferenciais + '</li>';
+                html += '</ul></div>';
 
                 if (banco.detalhes.aviso) {
-                    html += `<div class="warning-box">
-                        <strong>ATENÇÃO:</strong> ${banco.detalhes.aviso}
-                    </div>`;
+                    html += '<div class="warning-box"><strong>ATENÇÃO:</strong> ' + banco.detalhes.aviso + '</div>';
                 }
             }
 
             if (!aprovado && mostrarDetalhes) {
-                html += `<div class="rejection-details">
-                    <h4>MOTIVOS DA REPROVAÇÃO</h4>
-                    <ul>`;
-                
-                motivos.forEach(motivo => {
-                    html += `<li>${motivo}</li>`;
-                });
-                
-                html += `</ul></div>`;
+                html += '<div class="rejection-details"><h4>MOTIVOS DA REPROVAÇÃO</h4><ul>';
+                motivos.forEach(m => { html += '<li>' + m + '</li>'; });
+                html += '</ul></div>';
 
-                html += `<div class="suggestions">
-                    <h4>SUGESTÕES PARA APROVAÇÃO</h4>
-                    <ul>`;
-
+                html += '<div class="suggestions"><h4>SUGESTÕES PARA APROVAÇÃO</h4><ul>';
                 if (entradaTotal < entradaNecessaria) {
-                    const falta = entradaNecessaria - entradaTotal;
-                    html += `<li>Aumente a entrada em R$ ${formatMoney(falta)} (use FGTS adicional ou poupança)</li>`;
+                    html += '<li>Aumente a entrada em R$ ' + formatMoney(entradaNecessaria - entradaTotal) + ' (use FGTS adicional ou poupança)</li>';
                 }
                 if (comprometimento > 30) {
-                    html += `<li>Reduza o valor financiado ou aumente o prazo para diminuir a parcela</li>`;
-                    html += `<li>Considere composição de renda com cônjuge ou familiar</li>`;
+                    html += '<li>Reduza o valor financiado ou aumente o prazo para diminuir a parcela</li>';
+                    html += '<li>Considere composição de renda com cônjuge ou familiar</li>';
                 }
                 if (valorImovel > banco.limiteMax) {
-                    html += `<li>Escolha um imóvel de até R$ ${formatMoney(banco.limiteMax)}</li>`;
+                    html += '<li>Escolha um imóvel de até R$ ' + formatMoney(banco.limiteMax) + '</li>';
                 }
-                
-                html += `</ul></div>`;
+                html += '</ul></div>';
 
                 const alternativas = simularTodosBancos(valorImovel, entradaTotal, renda, prazo, sistema)
-                    .filter(r => r.aprovado && r.codigo !== codigo)
-                    .slice(0, 3);
-
+                    .filter(r => r.aprovado && r.codigo !== codigo).slice(0, 3);
                 if (alternativas.length > 0) {
-                    html += `<div class="alternatives">
-                        <h4>BANCOS QUE APROVARIAM SEU PERFIL</h4>
-                        <ul>`;
-                    
+                    html += '<div class="alternatives"><h4>BANCOS QUE APROVARIAM SEU PERFIL</h4><ul>';
                     alternativas.forEach(alt => {
-                        html += `<li>${alt.banco.nome} (taxa ${alt.banco.taxa.toFixed(2)}% a.a.) - Parcela: R$ ${formatMoney(alt.parcelaInicial)}</li>`;
+                        html += '<li>' + alt.banco.nome + ' (taxa ' + alt.banco.taxa.toFixed(2) + '% a.a.) — Parcela: R$ ' + formatMoney(alt.parcelaInicial) + '</li>';
                     });
-                    
-                    html += `</ul></div>`;
+                    html += '</ul></div>';
                 }
             }
 
-            html += `</div>`;
-
+            html += '</div>';
             return html;
+        }
+
+        /* ============ ENVIO PARA WHATSAPP DO CAL ============ */
+        function enviarParaCal(codigo) {
+            if (!ultimaSimulacao) return;
+            const r = resultadosCache[codigo];
+            const s = ultimaSimulacao;
+            const nome = document.getElementById('nome').value.trim() || 'Não informado';
+            const telefone = document.getElementById('telefone').value.trim() || 'Não informado';
+            const anos = (s.prazo / 12);
+            const anosTxt = Number.isInteger(anos) ? anos + ' anos' : (s.prazo + ' meses');
+
+            const linhas = [
+                'Olá Cal! Acabei de simular um financiamento:',
+                '',
+                '📋 MEUS DADOS:',
+                '• Nome: ' + nome,
+                '• Telefone: ' + telefone,
+                '',
+                '🏠 IMÓVEL:',
+                '• Tipo: ' + (s.tipo === 'novo' ? 'Novo' : 'Usado'),
+                '• Valor do imóvel: R$ ' + formatMoney(s.valorImovel),
+                '• Entrada: R$ ' + formatMoney(s.entrada),
+                '• FGTS disponível: R$ ' + formatMoney(s.fgts),
+                '',
+                '💰 SIMULAÇÃO:',
+                '• Renda mensal bruta: R$ ' + formatMoney(s.renda),
+                '• Prazo: ' + anosTxt,
+                '• Sistema: ' + s.sistema,
+                '• Banco escolhido: ' + r.banco.nome,
+                '',
+                '📊 RESULTADO:',
+                '• Valor financiado: R$ ' + formatMoney(r.valorFinanciado),
+                '• Primeira parcela: R$ ' + formatMoney(r.parcelaInicial),
+                '• Última parcela: R$ ' + formatMoney(r.parcelaFinal),
+                '• Total a pagar: R$ ' + formatMoney(r.totalPago),
+                '',
+                'Quero conversar sobre esse financiamento!'
+            ];
+
+            const texto = encodeURIComponent(linhas.join('\n'));
+            window.open('https://wa.me/' + WHATSAPP_CAL + '?text=' + texto, '_blank');
         }
 
         function formatMoney(value) {
             if (!value && value !== 0) return '0,00';
             return parseFloat(value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
-
-        window.addEventListener('load', function() {
-            aplicarMascaraDinheiro(document.getElementById('valorImovel'));
-            aplicarMascaraDinheiro(document.getElementById('entrada'));
-            aplicarMascaraDinheiro(document.getElementById('fgts'));
-            aplicarMascaraDinheiro(document.getElementById('renda'));
-        });
     </script>
 </body>
 </html>

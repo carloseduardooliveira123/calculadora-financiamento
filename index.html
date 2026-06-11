@@ -16,7 +16,9 @@
             --cinza-claro: #CECBBE;
             --branco: #FFFFFF;
             --aprovado: #4b6043;
-            --reprovado: #7d3b3b;
+            --aprovado-amarelo: #FFC400;
+            --aprovado-amarelo-escuro: #8a6d00;
+            --reprovado: #E03131;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -334,8 +336,8 @@
             transition: all 0.25s ease;
         }
 
-        .bank-card.approved { border-color: var(--aprovado); }
-        .bank-card.rejected { border-color: var(--reprovado); }
+        .bank-card.approved { border-color: var(--aprovado-amarelo); border-width: 2px; background: linear-gradient(to right, #fffdf2 0%, #ffffff 55%); }
+        .bank-card.rejected { border-color: var(--reprovado); background: linear-gradient(to right, #fff5f5 0%, #ffffff 55%); }
 
         .bank-header {
             display: flex;
@@ -353,9 +355,17 @@
             color: var(--terra-escuro);
         }
 
-        .status-badge { padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; }
-        .status-badge.approved { background: var(--aprovado); color: var(--branco); }
+        .status-badge { padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+        .status-badge.approved {
+            background: var(--aprovado-amarelo);
+            color: var(--preto);
+            animation: pulseAprovado 1.8s ease-in-out infinite;
+        }
         .status-badge.rejected { background: var(--reprovado); color: var(--branco); }
+        @keyframes pulseAprovado {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 196, 0, 0.6); }
+            50% { box-shadow: 0 0 0 8px rgba(255, 196, 0, 0); }
+        }
 
         .bank-details {
             display: grid;
@@ -371,13 +381,13 @@
         .detail-value.verde { color: var(--aprovado); }
 
         .approval-notice {
-            background: #f7f6f1;
-            border: 1px solid var(--cinza-claro);
+            background: #fffbe8;
+            border: 1px solid #ffe27a;
             border-radius: 8px;
             padding: 14px;
             margin-top: 14px;
         }
-        .approval-notice h5 { color: var(--terra-medio); margin-bottom: 6px; font-size: 14px; }
+        .approval-notice h5 { color: var(--aprovado-amarelo-escuro); margin-bottom: 6px; font-size: 14px; }
         .approval-notice p { color: var(--terra-escuro); font-size: 12.5px; line-height: 1.5; }
 
         .bank-info-box { background: #f7f6f1; border-radius: 8px; padding: 14px; margin-top: 14px; }

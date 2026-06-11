@@ -1,0 +1,4 @@
+# Configuração de deploy do Netlify — site estático (um único index.html)
+[build]
+  publish = "."
+  command = ""

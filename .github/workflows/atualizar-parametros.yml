@@ -1,0 +1,64 @@
+name: Atualizar parametros dos bancos
+
+# Roda todo dia de manha (08:00 BRT = 11:00 UTC) e tambem pode ser
+# disparado manualmente pelo botao "Run workflow" na aba Actions.
+on:
+  schedule:
+    - cron: "0 11 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar identidade do git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Verificar e atualizar parametros com Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --allowedTools Read,Edit,Bash,WebSearch,WebFetch
+            --max-turns 40
+          prompt: |
+            Voce mantem atualizados os parametros de financiamento imobiliario da calculadora do corretor Cal Oliveiras, publicada a partir deste repositorio (GitHub Pages e Netlify).
+
+            ARQUIVO ALVO: index.html (na raiz do repositorio, ja presente no diretorio de trabalho).
+
+            Dentro do <script> do index.html, os parametros estao em:
+            - const MCMV_FAIXAS = [...]  (faixas 1 a 4: rendaMax e tetoImovel)
+            - const TETO_SFH = 2250000
+            - const BANCOS = {...}  (10 bancos; campos numericos: taxa, ltvNovo, ltvUsado, prazoMax, limiteMax)
+            E o carimbo de data: <span id="dataVerificacao">DD/MM/AAAA</span>
+
+            TAREFA (faca hoje):
+            1. Descubra a data de hoje rodando no Bash: date +%d/%m/%Y
+            2. Pesquise na web os valores VIGENTES HOJE, priorizando fontes oficiais/confiaveis (caixa.gov.br, sites dos bancos, gov.br/cidades, Banco Central/bcb.gov.br, e imprensa economica reconhecida):
+               - Taxa de juros (a.a.) de financiamento imobiliario de cada banco: Caixa, BB, Itau, Bradesco, Santander, BRB, Inter, Sicredi, Sicoob, Viacredi (Ailos).
+               - Teto do SFH (hoje R$ 2.250.000) e % maximo financiado para imovel NOVO e USADO (entrada minima).
+               - Faixas do MCMV (1 a 4): renda maxima e teto do imovel, incluindo a Faixa 4 (classe media).
+            3. Compare com os valores atuais no index.html. Para cada divergencia confirmada por fonte confiavel, use a ferramenta Edit para alterar APENAS o numero correspondente (sem quebrar a sintaxe JS, sem mexer em textos/estrutura/estilo).
+            4. SEMPRE atualize o <span id="dataVerificacao"> para a data de hoje (DD/MM/AAAA), mesmo que nada mais mude.
+            5. Publique as mudancas rodando no Bash:
+               git add index.html
+               git commit -m "chore: atualiza parametros dos bancos $(date +%F)"
+               git push origin HEAD:main
+
+            REGRAS DE SEGURANCA (os valores aparecem para clientes reais):
+            - NUNCA invente numeros. So altere um parametro se houver fonte publica e confiavel confirmando o novo valor. Na duvida, mantenha o valor atual.
+            - Mantenha ltvNovo >= ltvUsado.
+            - Nao altere estrutura, estilo, textos ou logica do arquivo, apenas os numeros dos parametros e a data.
+            - Se nada (alem da data) mudar, ainda assim faca o commit/push so com a data atualizada.
+
+            Ao final, escreva um resumo: o que verificou, o que mudou (antigo -> novo + fonte) e confirme se o push foi concluido.

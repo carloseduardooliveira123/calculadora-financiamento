@@ -905,7 +905,66 @@
             leadCapturado = true;
             fecharLeadModal();
             executarSimulacao();
+            enviarLeadParaCRM();
             document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Envia o lead + diagnóstico da simulação para o CRM (em segundo plano).
+        // Passa por uma função serverless do Netlify, que repassa ao backend do CRM
+        // (sem CORS e sem expor o endereço do CRM no código do site).
+        function enviarLeadParaCRM() {
+            if (!ultimaSimulacao) return;
+            const s = ultimaSimulacao;
+            const nome = document.getElementById('nome').value.trim();
+            const telefone = document.getElementById('telefone').value.trim();
+            const entradaTotal = s.entrada + s.fgts;
+
+            const resultados = simularTodosBancos(s.valorImovel, entradaTotal, s.renda, s.prazo, s.sistema);
+            const aprovados = resultados.filter(r => r.aprovado);
+            const algumAprovado = aprovados.length > 0;
+            const melhor = algumAprovado ? aprovados[0] : resultados[0];
+            const anos = Number.isInteger(s.prazo / 12) ? (s.prazo / 12) + ' anos' : s.prazo + ' meses';
+
+            let diagnostico;
+            if (algumAprovado) {
+                diagnostico = 'RESULTADO: APROVADO\n' +
+                    'Melhor opcao: ' + melhor.banco.nome + ' — 1a parcela R$ ' + formatMoney(melhor.parcelaInicial) +
+                    ' | financiado R$ ' + formatMoney(melhor.valorFinanciado) +
+                    ' | comprometimento ' + melhor.comprometimento.toFixed(1) + '%\n' +
+                    'Bancos aprovados: ' + aprovados.map(a => a.banco.nome).join(', ');
+            } else {
+                const motivo = (melhor.motivos && melhor.motivos[0]) ? melhor.motivos[0] : 'criterios nao atendidos';
+                diagnostico = 'RESULTADO: NAO aprovado automaticamente\n' +
+                    'Melhor tentativa: ' + melhor.banco.nome + ' — parcela R$ ' + formatMoney(melhor.parcelaInicial) +
+                    ' (comprometimento ' + melhor.comprometimento.toFixed(1) + '%)\n' +
+                    'Motivo principal: ' + motivo + '\n' +
+                    'Angulo de abordagem: ajustar entrada, prazo, banco ou buscar imovel que encaixe no orcamento/MCMV';
+            }
+
+            const observacoes =
+                'SIMULACAO (via calculadora)\n' +
+                'Imovel: ' + (s.tipo === 'novo' ? 'Novo' : 'Usado') + ' · R$ ' + formatMoney(s.valorImovel) + '\n' +
+                'Entrada: R$ ' + formatMoney(s.entrada) + ' | FGTS: R$ ' + formatMoney(s.fgts) + '\n' +
+                'Renda: R$ ' + formatMoney(s.renda) + ' | Prazo: ' + anos + ' | Sistema: ' + s.sistema + '\n\n' +
+                diagnostico;
+
+            const payload = {
+                nome: nome,
+                telefone: telefone,
+                origem: 'Calculadora de Financiamento',
+                tipoInteresse: 'Financiamento - Imovel ' + (s.tipo === 'novo' ? 'Novo' : 'Usado'),
+                orcamento: s.valorImovel,
+                funil: 'Novo Lead',
+                temperatura: algumAprovado ? 'Quente' : 'Morno',
+                observacoes: observacoes
+            };
+
+            // Fire-and-forget: nunca bloqueia nem atrapalha o usuario.
+            fetch('/.netlify/functions/enviar-lead', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(function () { /* silencioso */ });
         }
 
         function executarSimulacao() {

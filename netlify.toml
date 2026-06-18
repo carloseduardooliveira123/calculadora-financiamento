@@ -2,3 +2,8 @@
 [build]
   publish = "."
   command = ""
+
+# Funções serverless (recebem o lead e repassam ao CRM)
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

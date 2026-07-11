@@ -16,8 +16,8 @@
             --cinza-claro: #CECBBE;
             --branco: #FFFFFF;
             --aprovado: #4b6043;
-            --aprovado-amarelo: #FFC400;
-            --aprovado-amarelo-escuro: #8a6d00;
+            --aprovado-vivo: #1FA653;
+            --aprovado-escuro: #136B36;
             --reprovado: #E03131;
         }
 
@@ -347,7 +347,7 @@
             transition: all 0.25s ease;
         }
 
-        .bank-card.approved { border-color: var(--aprovado-amarelo); border-width: 2px; background: linear-gradient(to right, #fffdf2 0%, #ffffff 55%); }
+        .bank-card.approved { border-color: var(--aprovado-vivo); border-width: 2px; background: linear-gradient(to right, #f2fbf6 0%, #ffffff 55%); }
         .bank-card.rejected { border-color: var(--reprovado); background: linear-gradient(to right, #fff5f5 0%, #ffffff 55%); }
 
         .bank-header {
@@ -368,14 +368,14 @@
 
         .status-badge { padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
         .status-badge.approved {
-            background: var(--aprovado-amarelo);
-            color: var(--preto);
+            background: var(--aprovado-vivo);
+            color: var(--branco);
             animation: pulseAprovado 1.8s ease-in-out infinite;
         }
         .status-badge.rejected { background: var(--reprovado); color: var(--branco); }
         @keyframes pulseAprovado {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 196, 0, 0.6); }
-            50% { box-shadow: 0 0 0 8px rgba(255, 196, 0, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(31, 166, 83, 0.55); }
+            50% { box-shadow: 0 0 0 8px rgba(31, 166, 83, 0); }
         }
 
         .bank-details {
@@ -392,13 +392,13 @@
         .detail-value.verde { color: var(--aprovado); }
 
         .approval-notice {
-            background: #fffbe8;
-            border: 1px solid #ffe27a;
+            background: #eefaf3;
+            border: 1px solid #b9e6c9;
             border-radius: 8px;
             padding: 14px;
             margin-top: 14px;
         }
-        .approval-notice h5 { color: var(--aprovado-amarelo-escuro); margin-bottom: 6px; font-size: 14px; }
+        .approval-notice h5 { color: var(--aprovado-escuro); margin-bottom: 6px; font-size: 14px; }
         .approval-notice p { color: var(--terra-escuro); font-size: 12.5px; line-height: 1.5; }
 
         .bank-info-box { background: #f7f6f1; border-radius: 8px; padding: 14px; margin-top: 14px; }
@@ -427,6 +427,38 @@
         .alternatives ul { list-style: none; }
         .alternatives li { padding: 6px 0 6px 22px; position: relative; color: var(--terra-escuro); font-size: 13.5px; }
         .alternatives li:before { content: "•"; position: absolute; left: 6px; color: var(--terra-medio); }
+
+        /* ---------- DICAS DE MELHORIA (pós-aprovação) ---------- */
+        .dicas-box {
+            background: linear-gradient(135deg, #eefaf3 0%, #f7fcf9 100%);
+            border: 1.5px solid var(--aprovado-vivo);
+            border-radius: 14px;
+            padding: 22px;
+            margin: 6px 0 20px;
+        }
+        .dicas-box h4 {
+            color: var(--aprovado-escuro);
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .dicas-sub { color: var(--terra-escuro); font-size: 13.5px; margin-bottom: 12px; }
+        .dicas-box ul { list-style: none; }
+        .dicas-box li {
+            padding: 7px 0 7px 24px;
+            position: relative;
+            color: var(--terra-escuro);
+            font-size: 13.5px;
+            line-height: 1.55;
+        }
+        .dicas-box li:before { content: "↑"; position: absolute; left: 2px; color: var(--aprovado-vivo); font-weight: 700; }
+        .dicas-box li strong { color: var(--aprovado-escuro); }
+        .dicas-cal {
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--terra-medio);
+        }
 
         /* ---------- WHATSAPP BUTTON ---------- */
         .btn-whatsapp {
@@ -558,7 +590,7 @@
             <span class="logo-creci">CRECI 39020F · Brusque/SC</span>
             <h1>Calculadora de Financiamento Imobiliário</h1>
             <p class="subtitle">Parâmetros atualizados · Junho 2026 · 10 instituições financeiras</p>
-            <p class="subtitle" style="margin-top:4px; font-size:12px;">Última verificação dos bancos: <span id="dataVerificacao">05/07/2026</span></p>
+            <p class="subtitle" style="margin-top:4px; font-size:12px;">Última verificação dos bancos: <span id="dataVerificacao">11/06/2026</span></p>
         </div>
 
         <div class="content">
@@ -674,9 +706,9 @@
 
         // Parâmetros MCMV — vigentes em junho/2026 (reforma 2026, aceita imóvel novo e usado)
         const MCMV_FAIXAS = [
-            { faixa: 1, rendaMax: 3200,  tetoImovel: 264000, subsidio: 'Subsídio direto do governo' },
-            { faixa: 2, rendaMax: 5000,  tetoImovel: 264000, subsidio: 'Subsídio direto do governo' },
-            { faixa: 3, rendaMax: 9600,  tetoImovel: 400000, subsidio: 'Sem subsídio, mas com taxas reduzidas' },
+            { faixa: 1, rendaMax: 2850,  tetoImovel: 264000, subsidio: 'Subsídio direto do governo' },
+            { faixa: 2, rendaMax: 4700,  tetoImovel: 264000, subsidio: 'Subsídio direto do governo' },
+            { faixa: 3, rendaMax: 8600,  tetoImovel: 400000, subsidio: 'Sem subsídio, mas com taxas reduzidas' },
             { faixa: 4, rendaMax: 13000, tetoImovel: 600000, subsidio: 'Classe média — novidade 2026 (entrada mín. 20%)' }
         ];
 
@@ -1025,6 +1057,7 @@
                 aprovados.forEach(res => {
                     html += renderBankCard(res, valorImovel, entradaTotal, renda, prazo, sistema, false);
                 });
+                html += renderDicasMelhoria(aprovados[0], valorImovel, entradaTotal, renda, prazo, sistema);
             }
             return html;
         }
@@ -1036,6 +1069,10 @@
             resultados.forEach(res => {
                 html += renderBankCard(res, valorImovel, entradaTotal, renda, prazo, sistema, true);
             });
+            const apsTodos = resultados.filter(r => r.aprovado);
+            if (apsTodos.length > 0) {
+                html += renderDicasMelhoria(apsTodos[0], valorImovel, entradaTotal, renda, prazo, sistema);
+            }
             return html;
         }
 
@@ -1046,6 +1083,9 @@
             let html = disclaimerHTML();
             html += '<h2 class="results-title">Análise detalhada</h2>';
             html += renderBankCard(resultado, valorImovel, entradaTotal, renda, prazo, sistema, true);
+            if (resultado.aprovado) {
+                html += renderDicasMelhoria(resultado, valorImovel, entradaTotal, renda, prazo, sistema);
+            }
             return html;
         }
 
@@ -1206,6 +1246,65 @@
                 }
             }
 
+            html += '</div>';
+            return html;
+        }
+
+        /* ============ DICAS DE MELHORIA (pós-aprovação) ============ */
+        // Gera dicas personalizadas, dentro das regras dos bancos, de como o
+        // usuário pode melhorar ainda mais o financiamento aprovado.
+        function renderDicasMelhoria(melhor, valorImovel, entradaTotal, renda, prazo, sistema) {
+            if (!melhor || !melhor.aprovado) return '';
+            const s = ultimaSimulacao || { fgts: 0 };
+            const taxaMensal = melhor.banco.taxa / 100 / 12;
+            const dicas = [];
+
+            // 1) Entrada maior => financia menos, paga menos juros, melhora negociação
+            const pctEntrada = valorImovel > 0 ? entradaTotal / valorImovel : 0;
+            if (pctEntrada < 0.3) {
+                const falta = valorImovel * 0.3 - entradaTotal;
+                dicas.push('<strong>Entrada:</strong> chegando a 30% de entrada (faltam R$ ' + formatMoney(falta) + '), você financia menos, paga menos juros no total e ganha força para negociar taxa melhor com o banco.');
+            }
+
+            // 2) Prazo menor => economia real de juros (estimativa SAC no melhor banco)
+            if (prazo > 240 && melhor.valorFinanciado > 0) {
+                const novoPrazo = prazo - 60;
+                const economia = taxaMensal * melhor.valorFinanciado * ((prazo + 1) - (novoPrazo + 1)) / 2;
+                dicas.push('<strong>Prazo:</strong> reduzindo de ' + Math.round(prazo / 12) + ' para ' + Math.round(novoPrazo / 12) + ' anos, a economia estimada é de <strong>R$ ' + formatMoney(economia) + '</strong> em juros no ' + melhor.banco.nome + '.');
+            }
+
+            // 3) Renda com folga => cabe prazo menor / Parcela apertada => PRICE alivia o início
+            if (melhor.comprometimento < 22 && prazo > 180) {
+                dicas.push('<strong>Parcela:</strong> seu comprometimento de renda está em ' + melhor.comprometimento.toFixed(1) + '% (o limite é 30%) — essa folga permite encurtar o prazo e economizar muito em juros sem apertar o orçamento.');
+            } else if (melhor.comprometimento > 25 && sistema === 'SAC') {
+                dicas.push('<strong>Parcela:</strong> se a primeira parcela apertar, o sistema PRICE deixa a parcela fixa e menor no início — alivia o comprometimento de ' + melhor.comprometimento.toFixed(1) + '% (o total pago, porém, é maior).');
+            }
+
+            // 4) FGTS
+            if ((s.fgts || 0) <= 0) {
+                dicas.push('<strong>FGTS:</strong> se você tem saldo de FGTS, ele pode reforçar a entrada sem mexer no bolso — e, a cada 2 anos, amortizar o saldo devedor (reduzindo prazo ou parcela).');
+            } else {
+                dicas.push('<strong>FGTS:</strong> além da entrada, o FGTS pode ser usado a cada 2 anos para amortizar o saldo devedor — cada amortização reduz o prazo ou a parcela.');
+            }
+
+            // 5) Enquadramento MCMV / taxa
+            const faixaDica = avaliarMCMV(renda, valorImovel, tipoImovel);
+            if (faixaDica) {
+                dicas.push('<strong>Taxa:</strong> você se enquadra no <strong>MCMV Faixa ' + faixaDica.faixa + '</strong> — confirme essa linha no banco: as taxas do programa são bem menores que as de balcão.');
+            } else if (renda <= 13000 && valorImovel > 600000) {
+                dicas.push('<strong>Enquadramento:</strong> com sua renda, um imóvel de até R$ 600.000,00 entraria na Faixa 4 do MCMV (taxa ~10% a.a.) — vale comparar o custo total das duas opções.');
+            }
+
+            const top = dicas.slice(0, 5);
+            if (top.length === 0) return '';
+
+            let html = '<div class="dicas-box">';
+            html += '<h4>Dá para melhorar ainda mais 📈</h4>';
+            html += '<p class="dicas-sub">Seu financiamento foi aprovado — e, dentro das regras dos bancos, esses ajustes deixam ele ainda mais barato:</p>';
+            html += '<ul>';
+            top.forEach(d => { html += '<li>' + d + '</li>'; });
+            html += '</ul>';
+            html += '<p class="dicas-cal">Fale com o Cal — ele monta o enquadramento ideal para o seu caso, sem custo.</p>';
             html += '</div>';
             return html;
         }

@@ -590,7 +590,7 @@
             <span class="logo-creci">CRECI 39020F · Brusque/SC</span>
             <h1>Calculadora de Financiamento Imobiliário</h1>
             <p class="subtitle">Parâmetros atualizados · Junho 2026 · 10 instituições financeiras</p>
-            <p class="subtitle" style="margin-top:4px; font-size:12px;">Última verificação dos bancos: <span id="dataVerificacao">11/06/2026</span></p>
+            <p class="subtitle" style="margin-top:4px; font-size:12px;">Última verificação dos bancos: <span id="dataVerificacao">20/07/2026</span></p>
         </div>
 
         <div class="content">
@@ -716,10 +716,11 @@
         // Teto do SFH elevado para R$ 2,25 milhões pelo CMN em 2026 (uso de FGTS até esse valor)
         const TETO_SFH = 2250000;
 
-        // Lote urbanizado (terreno puro) — regras oficiais da Caixa (FAQ Lote Urbanizado):
-        // cota máx. 70% no SAC / 60% na PRICE, prazo 120-240 meses, financiamento de
-        // R$ 50 mil a R$ 1,5 mi, SEM uso de FGTS e FORA do MCMV.
-        const TERRENO = { ltvSac: 70, ltvPrice: 60, prazoMax: 240, limiteMax: 1500000, valorMin: 50000 };
+        // Lote urbanizado (terreno puro) — confirmado no SIMULADOR OFICIAL da Caixa
+        // (jul/2026, modalidade "SBPE - Aquisição de Lote Urbanizado - Balcão"):
+        // cota máxima 80%, prazo máx. 240 meses, sistema SAC/TR, juros nominais
+        // ~12,73% a.a. (efetivos ~13,50%), SEM uso de FGTS e FORA do MCMV.
+        const TERRENO = { ltv: 80, prazoMax: 240, limiteMax: 1500000, valorMin: 50000, taxaNominal: 12.73, cetEfetivo: 13.50 };
 
         // ltvNovo / ltvUsado refletem a distinção novo x usado do briefing
         const BANCOS = {
@@ -871,7 +872,7 @@
                 return '<div class="mcmv-banner">' +
                     '<span class="faixa-tag">Terreno · Lote Urbanizado</span>' +
                     '<h4>Terreno tem regras próprias</h4>' +
-                    '<p>Financia até <strong>70% no SAC</strong> ou <strong>60% na PRICE</strong> · Prazo máximo: <strong>20 anos</strong> · <strong>Sem FGTS</strong> · Fora do MCMV · Financiamento de R$ 50 mil a R$ 1,5 mi.</p>' +
+                    '<p>Financia até <strong>80%</strong> (entrada mínima de 20%) · Prazo máximo: <strong>20 anos</strong> · <strong>Sem FGTS</strong> · Fora do MCMV · Sistema <strong>SAC/TR</strong> · Juros ~<strong>12,73% a.a.</strong> — condições confirmadas no simulador oficial da Caixa.</p>' +
                     avisos +
                     '<p style="margin-top:10px;"><strong>Dica do Cal:</strong> comprando <strong>terreno + construção</strong> em um contrato único, você volta a financiar até 80% do total, usar FGTS e pode até enquadrar no MCMV.</p>' +
                     '</div>';
@@ -1143,7 +1144,7 @@
             // Parâmetros efetivos conforme o tipo (terreno tem regras próprias)
             let ltv, prazoMaxEfetivo, limiteEfetivo;
             if (ehTerreno) {
-                ltv = sistema === 'SAC' ? TERRENO.ltvSac : TERRENO.ltvPrice;
+                ltv = TERRENO.ltv;
                 prazoMaxEfetivo = TERRENO.prazoMax;
                 limiteEfetivo = TERRENO.limiteMax;
             } else {
@@ -1167,7 +1168,7 @@
             if (entradaTotal < entradaNecessaria) {
                 aprovado = false;
                 const falta = entradaNecessaria - entradaTotal;
-                motivos.push('Entrada insuficiente: você tem R$ ' + formatMoney(entradaTotal) + ', precisa de R$ ' + formatMoney(entradaNecessaria) + ' (faltam R$ ' + formatMoney(falta) + ') para ' + (ehTerreno ? 'terreno — financia até ' + ltv + '% no ' + sistema + ', sem FGTS' : 'imóvel ' + tipoImovel + ' (LTV ' + ltv + '%)'));
+                motivos.push('Entrada insuficiente: você tem R$ ' + formatMoney(entradaTotal) + ', precisa de R$ ' + formatMoney(entradaNecessaria) + ' (faltam R$ ' + formatMoney(falta) + ') para ' + (ehTerreno ? 'terreno — financia até ' + ltv + '%, sem FGTS' : 'imóvel ' + tipoImovel + ' (LTV ' + ltv + '%)'));
             }
 
             if (valorImovel > limiteEfetivo) {
@@ -1190,7 +1191,8 @@
                 motivos.push('Renda (R$ ' + formatMoney(renda) + ') abaixo do mínimo exigido (R$ ' + formatMoney(banco.renda_min) + ')');
             }
 
-            const taxaMensal = banco.taxa / 100 / 12;
+            const taxaAplicada = ehTerreno ? TERRENO.taxaNominal : banco.taxa;
+            const taxaMensal = taxaAplicada / 100 / 12;
             let parcelaInicial = 0, parcelaFinal = 0, totalPago = 0;
 
             if (valorFinanciado > 0) {
@@ -1214,11 +1216,11 @@
                 motivos.push('Renda comprometida: ' + comprometimento.toFixed(1) + '% da renda (máximo 30%). Parcela: R$ ' + formatMoney(parcelaInicial));
             }
 
-            const cetEstimado = banco.taxa + 1.3;
+            const cetEstimado = ehTerreno ? TERRENO.cetEfetivo : banco.taxa + 1.3;
 
             const resultado = {
                 codigo, banco, aprovado, motivos, valorFinanciado,
-                parcelaInicial, parcelaFinal, totalPago, ltv,
+                parcelaInicial, parcelaFinal, totalPago, ltv, taxaAplicada,
                 ltvSolicitado, comprometimento, entradaNecessaria, cetEstimado
             };
             resultadosCache[codigo] = resultado;
@@ -1226,7 +1228,7 @@
         }
 
         function renderBankCard(resultado, valorImovel, entradaTotal, renda, prazo, sistema, mostrarDetalhes) {
-            const { codigo, banco, aprovado, motivos, valorFinanciado, parcelaInicial, parcelaFinal, totalPago, ltv, comprometimento, entradaNecessaria, cetEstimado } = resultado;
+            const { codigo, banco, aprovado, motivos, valorFinanciado, parcelaInicial, parcelaFinal, totalPago, ltv, taxaAplicada, comprometimento, entradaNecessaria, cetEstimado } = resultado;
 
             let html = '<div class="bank-card ' + (aprovado ? 'approved' : 'rejected') + '">';
             html += '<div class="bank-header">' +
@@ -1235,7 +1237,7 @@
                 '</div>';
 
             html += '<div class="bank-details">' +
-                '<div class="detail-item"><div class="detail-label">Taxa Nominal</div><div class="detail-value">' + banco.taxa.toFixed(2) + '% a.a. + ' + banco.detalhes.tipo_taxa + '</div></div>' +
+                '<div class="detail-item"><div class="detail-label">Taxa Nominal</div><div class="detail-value">' + (taxaAplicada || banco.taxa).toFixed(2) + '% a.a. + ' + (tipoImovel === 'terreno' ? 'TR' : banco.detalhes.tipo_taxa) + '</div></div>' +
                 '<div class="detail-item"><div class="detail-label">CET (estimado)</div><div class="detail-value">' + cetEstimado.toFixed(2) + '% a.a.</div></div>' +
                 '<div class="detail-item"><div class="detail-label">LTV (' + tipoImovel + ')</div><div class="detail-value">' + ltv + '%</div></div>' +
                 '<div class="detail-item"><div class="detail-label">Prazo Máximo</div><div class="detail-value">' + banco.prazoMax + ' meses</div></div>' +
@@ -1254,7 +1256,7 @@
                 html += '<div class="approval-notice"><h5>Aprovação baseada em critérios públicos</h5>' +
                     '<p>O banco poderá aprovar um percentual menor que ' + ltv + '% conforme análise individual de crédito, score e histórico. Confirme o percentual real para o seu perfil.</p></div>';
                 if (tipoImovel === 'terreno') {
-                    html += '<div class="warning-box"><strong>Modalidade lote urbanizado:</strong> a taxa desta linha costuma ser um pouco superior à taxa de habitação exibida acima — confirme o valor exato com o Cal antes de fechar.</div>';
+                    html += '<div class="warning-box"><strong>Modalidade lote urbanizado:</strong> juros nominais de ~12,73% a.a. + TR (efetivos ~13,50%), conforme o simulador oficial da Caixa — o Cal confirma a taxa exata para o seu perfil.</div>';
                 }
                 // Botão WhatsApp por banco aprovado
                 html += '<button class="btn-whatsapp" onclick="enviarParaCal(\'' + codigo + '\')">' +
@@ -1344,7 +1346,7 @@
                 // 4-T) Terreno + construção: destrava FGTS, 80% e até MCMV
                 dicas.push('<strong>Terreno + construção:</strong> financiando os dois em um contrato único, você volta a financiar até <strong>80% do total</strong>, pode usar o <strong>FGTS</strong>' + ((s.fgts || 0) > 0 ? ' (os R$ ' + formatMoney(s.fgts) + ' que ficaram de fora)' : '') + ' e, dependendo do projeto, até enquadrar no <strong>MCMV</strong> — geralmente sai mais barato que comprar o lote isolado.');
                 if (sistema !== 'SAC') {
-                    dicas.push('<strong>Sistema:</strong> para terreno, o SAC financia até <strong>70%</strong> (contra 60% da PRICE) — mudar o sistema reduz a entrada mínima exigida.');
+                    dicas.push('<strong>Sistema:</strong> a linha de lote urbanizado da Caixa opera em <strong>SAC/TR</strong> — simule em SAC para refletir as condições reais da modalidade.');
                 }
             } else {
                 // 4) FGTS

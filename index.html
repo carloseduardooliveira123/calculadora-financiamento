@@ -192,7 +192,7 @@
             color: var(--cinza);
         }
 
-        .tipo-option:first-child { border-right: 1.5px solid var(--cinza-claro); }
+        .tipo-option:not(:last-child) { border-right: 1.5px solid var(--cinza-claro); }
 
         .tipo-option.active {
             background: var(--terra-medio);
@@ -600,6 +600,7 @@
                     <div class="tipo-toggle" id="tipoToggle">
                         <div class="tipo-option active" data-tipo="novo">Novo</div>
                         <div class="tipo-option" data-tipo="usado">Usado</div>
+                        <div class="tipo-option" data-tipo="terreno">Terreno</div>
                     </div>
                 </div>
                 <div class="mode-btn active" data-mode="inteligente">
@@ -715,11 +716,16 @@
         // Teto do SFH elevado para R$ 2,25 milhões pelo CMN em 2026 (uso de FGTS até esse valor)
         const TETO_SFH = 2250000;
 
+        // Lote urbanizado (terreno puro) — regras oficiais da Caixa (FAQ Lote Urbanizado):
+        // cota máx. 70% no SAC / 60% na PRICE, prazo 120-240 meses, financiamento de
+        // R$ 50 mil a R$ 1,5 mi, SEM uso de FGTS e FORA do MCMV.
+        const TERRENO = { ltvSac: 70, ltvPrice: 60, prazoMax: 240, limiteMax: 1500000, valorMin: 50000 };
+
         // ltvNovo / ltvUsado refletem a distinção novo x usado do briefing
         const BANCOS = {
             CAIXA: {
                 nome: 'Caixa Econômica Federal', taxa: 11.19, ltvNovo: 90, ltvUsado: 80,
-                prazoMax: 420, limiteMax: 2250000, mcmv: true, renda_min: 0,
+                prazoMax: 420, limiteMax: 2250000, mcmv: true, renda_min: 0, terreno: true,
                 detalhes: {
                     tipo_taxa: 'TR',
                     mcmv_info: 'Principal operador MCMV — F1: 4,00-4,25% | F2: 4,75-7,00% | F3: 8,16% | F4: 10,00%',
@@ -852,6 +858,25 @@
         }
 
         function renderMCMVBanner(renda, valorImovel, tipo) {
+            // Terreno (lote urbanizado) tem banner próprio: regras diferentes, sem MCMV
+            if (tipo === 'terreno') {
+                const s = ultimaSimulacao || {};
+                let avisos = '';
+                if ((s.fgts || 0) > 0) {
+                    avisos += '<p style="margin-top:10px;"><strong>Atenção:</strong> o FGTS informado (R$ ' + formatMoney(s.fgts) + ') <strong>não entrou</strong> na conta — a lei não permite usar FGTS para comprar terreno isolado.</p>';
+                }
+                if (s.prazoAjustado) {
+                    avisos += '<p style="margin-top:10px;"><strong>Prazo ajustado:</strong> o máximo para terreno é <strong>240 meses (20 anos)</strong> — a simulação já usa esse limite.</p>';
+                }
+                return '<div class="mcmv-banner">' +
+                    '<span class="faixa-tag">Terreno · Lote Urbanizado</span>' +
+                    '<h4>Terreno tem regras próprias</h4>' +
+                    '<p>Financia até <strong>70% no SAC</strong> ou <strong>60% na PRICE</strong> · Prazo máximo: <strong>20 anos</strong> · <strong>Sem FGTS</strong> · Fora do MCMV · Financiamento de R$ 50 mil a R$ 1,5 mi.</p>' +
+                    avisos +
+                    '<p style="margin-top:10px;"><strong>Dica do Cal:</strong> comprando <strong>terreno + construção</strong> em um contrato único, você volta a financiar até 80% do total, usar FGTS e pode até enquadrar no MCMV.</p>' +
+                    '</div>';
+            }
+
             const faixa = avaliarMCMV(renda, valorImovel, tipo);
 
             if (!faixa) {
@@ -975,7 +1000,7 @@
 
             const observacoes =
                 'SIMULACAO (via calculadora)\n' +
-                'Imovel: ' + (s.tipo === 'novo' ? 'Novo' : 'Usado') + ' · R$ ' + formatMoney(s.valorImovel) + '\n' +
+                'Imovel: ' + nomeTipo(s.tipo) + ' · R$ ' + formatMoney(s.valorImovel) + '\n' +
                 'Entrada: R$ ' + formatMoney(s.entrada) + ' | FGTS: R$ ' + formatMoney(s.fgts) + '\n' +
                 'Renda: R$ ' + formatMoney(s.renda) + ' | Prazo: ' + anos + ' | Sistema: ' + s.sistema + '\n\n' +
                 diagnostico;
@@ -984,7 +1009,7 @@
                 nome: nome,
                 telefone: telefone,
                 origem: 'Calculadora de Financiamento',
-                tipoInteresse: 'Financiamento - Imovel ' + (s.tipo === 'novo' ? 'Novo' : 'Usado'),
+                tipoInteresse: s.tipo === 'terreno' ? 'Financiamento - Terreno' : 'Financiamento - Imovel ' + nomeTipo(s.tipo),
                 orcamento: s.valorImovel,
                 funil: 'Novo Lead',
                 temperatura: algumAprovado ? 'Quente' : 'Morno',
@@ -1004,11 +1029,20 @@
             const entrada = removerMascara(document.getElementById('entrada').value);
             const fgts = removerMascara(document.getElementById('fgts').value);
             const renda = removerMascara(document.getElementById('renda').value);
-            const prazo = parseInt(document.getElementById('prazo').value) || 360;
+            let prazo = parseInt(document.getElementById('prazo').value) || 360;
             const sistema = document.getElementById('sistema').value;
-            const entradaTotal = entrada + fgts;
 
-            ultimaSimulacao = { valorImovel, entrada, fgts, renda, prazo, sistema, tipo: tipoImovel };
+            // Terreno (lote urbanizado): FGTS não pode compor a entrada e o prazo
+            // máximo é 240 meses — ajustamos automaticamente e avisamos no banner.
+            let prazoAjustado = false;
+            if (tipoImovel === 'terreno' && prazo > TERRENO.prazoMax) {
+                prazo = TERRENO.prazoMax;
+                document.getElementById('prazo').value = String(prazo);
+                prazoAjustado = true;
+            }
+            const entradaTotal = tipoImovel === 'terreno' ? entrada : entrada + fgts;
+
+            ultimaSimulacao = { valorImovel, entrada, fgts, renda, prazo, sistema, tipo: tipoImovel, prazoAjustado };
 
             let html = renderMCMVBanner(renda, valorImovel, tipoImovel);
 
@@ -1028,8 +1062,8 @@
         function disclaimerHTML() {
             return '<div class="info-disclaimer">' +
                 '<h4>Leia antes de consultar os bancos</h4>' +
-                '<p>Esta simulação utiliza os <strong>critérios máximos públicos</strong> de cada banco para imóvel ' +
-                '<strong>' + (tipoImovel === 'novo' ? 'novo' : 'usado') + '</strong>. Na prática, o percentual aprovado pode ser menor conforme:</p>' +
+                '<p>Esta simulação utiliza os <strong>critérios máximos públicos</strong> de cada banco para ' +
+                (tipoImovel === 'terreno' ? '<strong>terreno (lote urbanizado)</strong>' : 'imóvel <strong>' + (tipoImovel === 'novo' ? 'novo' : 'usado') + '</strong>') + '. Na prática, o percentual aprovado pode ser menor conforme:</p>' +
                 '<ul>' +
                 '<li><strong>Score de crédito</strong> e histórico de pagamentos</li>' +
                 '<li><strong>Relacionamento bancário</strong> e movimentação financeira</li>' +
@@ -1104,28 +1138,51 @@
 
         function simularBanco(codigo, valorImovel, entradaTotal, renda, prazo, sistema) {
             const banco = BANCOS[codigo];
-            const ltv = (tipoImovel === 'novo') ? banco.ltvNovo : banco.ltvUsado;
+            const ehTerreno = tipoImovel === 'terreno';
+
+            // Parâmetros efetivos conforme o tipo (terreno tem regras próprias)
+            let ltv, prazoMaxEfetivo, limiteEfetivo;
+            if (ehTerreno) {
+                ltv = sistema === 'SAC' ? TERRENO.ltvSac : TERRENO.ltvPrice;
+                prazoMaxEfetivo = TERRENO.prazoMax;
+                limiteEfetivo = TERRENO.limiteMax;
+            } else {
+                ltv = (tipoImovel === 'novo') ? banco.ltvNovo : banco.ltvUsado;
+                prazoMaxEfetivo = banco.prazoMax;
+                limiteEfetivo = banco.limiteMax;
+            }
+
             const valorFinanciado = valorImovel - entradaTotal;
             const ltvSolicitado = (valorFinanciado / valorImovel) * 100;
 
             const motivos = [];
             let aprovado = true;
 
+            if (ehTerreno && !banco.terreno) {
+                aprovado = false;
+                motivos.push('Linha de financiamento de terreno/lote urbanizado não confirmada neste banco — o Cal indica as alternativas disponíveis');
+            }
+
             const entradaNecessaria = valorImovel * (1 - ltv / 100);
             if (entradaTotal < entradaNecessaria) {
                 aprovado = false;
                 const falta = entradaNecessaria - entradaTotal;
-                motivos.push('Entrada insuficiente: você tem R$ ' + formatMoney(entradaTotal) + ', precisa de R$ ' + formatMoney(entradaNecessaria) + ' (faltam R$ ' + formatMoney(falta) + ') para imóvel ' + tipoImovel + ' (LTV ' + ltv + '%)');
+                motivos.push('Entrada insuficiente: você tem R$ ' + formatMoney(entradaTotal) + ', precisa de R$ ' + formatMoney(entradaNecessaria) + ' (faltam R$ ' + formatMoney(falta) + ') para ' + (ehTerreno ? 'terreno — financia até ' + ltv + '% no ' + sistema + ', sem FGTS' : 'imóvel ' + tipoImovel + ' (LTV ' + ltv + '%)'));
             }
 
-            if (valorImovel > banco.limiteMax) {
+            if (valorImovel > limiteEfetivo) {
                 aprovado = false;
-                motivos.push('Valor do imóvel (R$ ' + formatMoney(valorImovel) + ') excede o limite do banco (R$ ' + formatMoney(banco.limiteMax) + ')');
+                motivos.push('Valor do ' + (ehTerreno ? 'terreno' : 'imóvel') + ' (R$ ' + formatMoney(valorImovel) + ') excede o limite da modalidade (R$ ' + formatMoney(limiteEfetivo) + ')');
             }
 
-            if (prazo > banco.prazoMax) {
+            if (ehTerreno && valorFinanciado > 0 && valorFinanciado < TERRENO.valorMin) {
                 aprovado = false;
-                motivos.push('Prazo solicitado (' + prazo + ' meses) excede o máximo do banco (' + banco.prazoMax + ' meses)');
+                motivos.push('Valor financiado (R$ ' + formatMoney(valorFinanciado) + ') abaixo do mínimo da modalidade lote urbanizado (R$ ' + formatMoney(TERRENO.valorMin) + ')');
+            }
+
+            if (prazo > prazoMaxEfetivo) {
+                aprovado = false;
+                motivos.push('Prazo solicitado (' + prazo + ' meses) excede o máximo (' + prazoMaxEfetivo + ' meses' + (ehTerreno ? ' para terreno' : '') + ')');
             }
 
             if (banco.renda_min > 0 && renda < banco.renda_min) {
@@ -1196,6 +1253,9 @@
             if (aprovado) {
                 html += '<div class="approval-notice"><h5>Aprovação baseada em critérios públicos</h5>' +
                     '<p>O banco poderá aprovar um percentual menor que ' + ltv + '% conforme análise individual de crédito, score e histórico. Confirme o percentual real para o seu perfil.</p></div>';
+                if (tipoImovel === 'terreno') {
+                    html += '<div class="warning-box"><strong>Modalidade lote urbanizado:</strong> a taxa desta linha costuma ser um pouco superior à taxa de habitação exibida acima — confirme o valor exato com o Cal antes de fechar.</div>';
+                }
                 // Botão WhatsApp por banco aprovado
                 html += '<button class="btn-whatsapp" onclick="enviarParaCal(\'' + codigo + '\')">' +
                     '<svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.8-2.8-1.5-3.9-3.4-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 1.9.8 2.6.9 3.5.8.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"/></svg>' +
@@ -1280,19 +1340,27 @@
                 dicas.push('<strong>Parcela:</strong> se a primeira parcela apertar, o sistema PRICE deixa a parcela fixa e menor no início — alivia o comprometimento de ' + melhor.comprometimento.toFixed(1) + '% (o total pago, porém, é maior).');
             }
 
-            // 4) FGTS
-            if ((s.fgts || 0) <= 0) {
-                dicas.push('<strong>FGTS:</strong> se você tem saldo de FGTS, ele pode reforçar a entrada sem mexer no bolso — e, a cada 2 anos, amortizar o saldo devedor (reduzindo prazo ou parcela).');
+            if (tipoImovel === 'terreno') {
+                // 4-T) Terreno + construção: destrava FGTS, 80% e até MCMV
+                dicas.push('<strong>Terreno + construção:</strong> financiando os dois em um contrato único, você volta a financiar até <strong>80% do total</strong>, pode usar o <strong>FGTS</strong>' + ((s.fgts || 0) > 0 ? ' (os R$ ' + formatMoney(s.fgts) + ' que ficaram de fora)' : '') + ' e, dependendo do projeto, até enquadrar no <strong>MCMV</strong> — geralmente sai mais barato que comprar o lote isolado.');
+                if (sistema !== 'SAC') {
+                    dicas.push('<strong>Sistema:</strong> para terreno, o SAC financia até <strong>70%</strong> (contra 60% da PRICE) — mudar o sistema reduz a entrada mínima exigida.');
+                }
             } else {
-                dicas.push('<strong>FGTS:</strong> além da entrada, o FGTS pode ser usado a cada 2 anos para amortizar o saldo devedor — cada amortização reduz o prazo ou a parcela.');
-            }
+                // 4) FGTS
+                if ((s.fgts || 0) <= 0) {
+                    dicas.push('<strong>FGTS:</strong> se você tem saldo de FGTS, ele pode reforçar a entrada sem mexer no bolso — e, a cada 2 anos, amortizar o saldo devedor (reduzindo prazo ou parcela).');
+                } else {
+                    dicas.push('<strong>FGTS:</strong> além da entrada, o FGTS pode ser usado a cada 2 anos para amortizar o saldo devedor — cada amortização reduz o prazo ou a parcela.');
+                }
 
-            // 5) Enquadramento MCMV / taxa
-            const faixaDica = avaliarMCMV(renda, valorImovel, tipoImovel);
-            if (faixaDica) {
-                dicas.push('<strong>Taxa:</strong> você se enquadra no <strong>MCMV Faixa ' + faixaDica.faixa + '</strong> — confirme essa linha no banco: as taxas do programa são bem menores que as de balcão.');
-            } else if (renda <= 13000 && valorImovel > 600000) {
-                dicas.push('<strong>Enquadramento:</strong> com sua renda, um imóvel de até R$ 600.000,00 entraria na Faixa 4 do MCMV (taxa ~10% a.a.) — vale comparar o custo total das duas opções.');
+                // 5) Enquadramento MCMV / taxa
+                const faixaDica = avaliarMCMV(renda, valorImovel, tipoImovel);
+                if (faixaDica) {
+                    dicas.push('<strong>Taxa:</strong> você se enquadra no <strong>MCMV Faixa ' + faixaDica.faixa + '</strong> — confirme essa linha no banco: as taxas do programa são bem menores que as de balcão.');
+                } else if (renda <= 13000 && valorImovel > 600000) {
+                    dicas.push('<strong>Enquadramento:</strong> com sua renda, um imóvel de até R$ 600.000,00 entraria na Faixa 4 do MCMV (taxa ~10% a.a.) — vale comparar o custo total das duas opções.');
+                }
             }
 
             const top = dicas.slice(0, 5);
@@ -1327,7 +1395,7 @@
                 '• Telefone: ' + telefone,
                 '',
                 '🏠 IMÓVEL:',
-                '• Tipo: ' + (s.tipo === 'novo' ? 'Novo' : 'Usado'),
+                '• Tipo: ' + nomeTipo(s.tipo),
                 '• Valor do imóvel: R$ ' + formatMoney(s.valorImovel),
                 '• Entrada: R$ ' + formatMoney(s.entrada),
                 '• FGTS disponível: R$ ' + formatMoney(s.fgts),
@@ -1349,6 +1417,10 @@
 
             const texto = encodeURIComponent(linhas.join('\n'));
             window.open('https://wa.me/' + WHATSAPP_CAL + '?text=' + texto, '_blank');
+        }
+
+        function nomeTipo(t) {
+            return t === 'novo' ? 'Novo' : t === 'usado' ? 'Usado' : 'Terreno';
         }
 
         function formatMoney(value) {

@@ -573,6 +573,63 @@
         }
         .footer a { color: var(--cinza-claro); text-decoration: none; }
 
+        /* ---------- IMPRESSÃO / PDF ---------- */
+        .acoes-topo { margin-bottom: 18px; }
+        .btn-imprimir {
+            background: var(--terra-escuro);
+            color: var(--branco);
+            border: none;
+            padding: 13px 22px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+        .btn-imprimir:hover { background: var(--preto); transform: translateY(-1px); }
+
+        .resumo-sim {
+            background: #f7f6f1;
+            border: 1px solid var(--cinza-claro);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+        }
+        .resumo-titulo { font-weight: 700; color: var(--terra-medio); font-size: 15px; margin-bottom: 4px; }
+        .resumo-linha { font-size: 13px; color: var(--terra-escuro); }
+        .print-only { display: none; }
+        .print-rodape { margin-top: 18px; font-size: 11px; color: var(--cinza); text-align: center; line-height: 1.5; }
+
+        @media print {
+            @page { margin: 12mm; }
+            body { background: #fff !important; padding: 0; }
+            .container { box-shadow: none; border-radius: 0; max-width: 100%; }
+            /* esconde tudo que não faz parte do comprovante */
+            .mode-selector, .form-section, .footer, .modal-overlay, .btn-whatsapp,
+            .approval-notice, .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            /* cabeçalho da marca em versão clara (economiza tinta e fica legível) */
+            .header { background: #fff !important; border-bottom: 2px solid var(--terra-medio); padding: 8px 0 12px; }
+            .header .logo-name, .header h1 { color: var(--preto) !important; }
+            .header .logo-sub, .header .logo-creci, .header .subtitle { color: var(--terra-medio) !important; }
+            .header h1 { font-size: 18px; margin-top: 8px; }
+            .header .logo-name { font-size: 30px; }
+            .content { padding: 8px 4px; }
+            /* não quebrar blocos no meio da página */
+            .bank-card, .mcmv-banner, .dicas-box, .info-disclaimer, .suggestions,
+            .rejection-details, .bank-info-box, .resumo-sim, .alternatives { break-inside: avoid; page-break-inside: avoid; }
+            .status-badge.approved { animation: none !important; }
+            /* cores de fundo não imprimem por padrão: força texto escuro e bordas */
+            .mcmv-banner, .mcmv-banner * { background: #fff !important; color: var(--preto) !important; }
+            .mcmv-banner { border: 1.5px solid var(--terra-medio) !important; }
+            .status-badge.approved { background: #fff !important; color: var(--aprovado-escuro) !important; border: 1.5px solid var(--aprovado-escuro); }
+            .status-badge.rejected { background: #fff !important; color: #a01e1e !important; border: 1.5px solid #a01e1e; }
+            .faixa-tag { background: #fff !important; color: var(--terra-medio) !important; border: 1px solid var(--terra-medio); }
+            a { color: #000; text-decoration: none; }
+        }
+
         @media (max-width: 768px) {
             .mode-selector { grid-template-columns: 1fr 1fr; }
             .bank-details { grid-template-columns: 1fr 1fr; }
@@ -1069,17 +1126,33 @@
 
             ultimaSimulacao = { valorImovel, entrada, fgts, renda, prazo, sistema, tipo: tipoImovel, prazoAjustado };
 
-            let html = renderMCMVBanner(renda, valorImovel, tipoImovel);
+            let corpo = renderMCMVBanner(renda, valorImovel, tipoImovel);
 
             if (modoAtual === 'inteligente') {
-                html += calcularInteligente(valorImovel, entradaTotal, renda, prazo, sistema);
+                corpo += calcularInteligente(valorImovel, entradaTotal, renda, prazo, sistema);
             } else if (modoAtual === 'todos') {
-                html += calcularTodos(valorImovel, entradaTotal, renda, prazo, sistema);
+                corpo += calcularTodos(valorImovel, entradaTotal, renda, prazo, sistema);
             } else {
                 const r = calcularEspecifico(valorImovel, entradaTotal, renda, prazo, sistema);
                 if (r === null) return;
-                html += r;
+                corpo += r;
             }
+
+            // Botão de impressão/PDF + resumo (aparece no PDF) + rodapé com a identidade
+            const nomeCli = (document.getElementById('nome').value || '').trim();
+            const hoje = new Date().toLocaleDateString('pt-BR');
+            const anosTxt = Number.isInteger(prazo / 12) ? (prazo / 12) + ' anos' : prazo + ' meses';
+
+            let html = '<div class="acoes-topo no-print"><button class="btn-imprimir" onclick="window.print()">🖨️ Baixar / Imprimir em PDF</button></div>';
+            html += '<div class="resumo-sim">' +
+                '<div class="resumo-titulo">Simulação de Financiamento' + (nomeCli ? ' · ' + nomeCli : '') + ' · ' + hoje + '</div>' +
+                '<div class="resumo-linha">' + nomeTipo(tipoImovel) + ' · Valor ' +
+                (tipoImovel === 'construir' ? '(terreno+obra) ' : '') + 'R$ ' + formatMoney(valorImovel) +
+                ' · Entrada R$ ' + formatMoney(entrada) + (fgts > 0 ? ' + FGTS R$ ' + formatMoney(fgts) : '') +
+                ' · Renda R$ ' + formatMoney(renda) + ' · Prazo ' + anosTxt + ' · ' + sistema + '</div>' +
+                '</div>';
+            html += corpo;
+            html += '<div class="print-rodape print-only">Cal Oliveiras · Corretor Particular · CRECI 39020F · Brusque/SC · WhatsApp (47) 99900-1754<br>Simulação de referência, com critérios públicos dos bancos — sujeita à análise e aprovação da instituição.</div>';
 
             document.getElementById('results').innerHTML = html;
         }

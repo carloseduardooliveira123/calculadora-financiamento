@@ -1248,13 +1248,13 @@
             if (aprovado) {
                 html += '<div class="detail-item"><div class="detail-label">Valor Financiado</div><div class="detail-value destaque">R$ ' + formatMoney(valorFinanciado) + '</div></div>' +
                     '<div class="detail-item"><div class="detail-label">1ª Parcela (' + sistema + ')</div><div class="detail-value verde">R$ ' + formatMoney(parcelaInicial) + '</div></div>' +
-                    '<div class="detail-item"><div class="detail-label">Última Parcela</div><div class="detail-value">R$ ' + formatMoney(parcelaFinal) + '</div></div>' +
-                    '<div class="detail-item"><div class="detail-label">Total a Pagar</div><div class="detail-value">R$ ' + formatMoney(totalPago) + '</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">Última Parcela (menor)</div><div class="detail-value">R$ ' + formatMoney(parcelaFinal) + '</div></div>' +
                     '<div class="detail-item"><div class="detail-label">Comprometimento</div><div class="detail-value">' + comprometimento.toFixed(1) + '%</div></div>';
             }
             html += '</div>';
 
             if (aprovado) {
+                html += '<div class="warning-box" style="border-left-color: var(--aprovado-vivo);"><strong>💡 Bom saber:</strong> você não precisa pagar até o fim. Amortizando ou quitando antes do prazo, você <strong>abate juros</strong> — e no SAC a parcela ainda diminui todo mês.</div>';
                 html += '<div class="approval-notice"><h5>Aprovação baseada em critérios públicos</h5>' +
                     '<p>O banco poderá aprovar um percentual menor que ' + ltv + '% conforme análise individual de crédito, score e histórico. Confirme o percentual real para o seu perfil.</p></div>';
                 if (tipoImovel === 'terreno') {
@@ -1286,16 +1286,55 @@
                 motivos.forEach(m => { html += '<li>' + m + '</li>'; });
                 html += '</ul></div>';
 
-                html += '<div class="suggestions"><h4>SUGESTÕES PARA APROVAÇÃO</h4><ul>';
+                const taxaMensalR = (taxaAplicada || banco.taxa) / 100 / 12;
+                const parcelaMax = renda * 0.30;
+                const limiteExib = tipoImovel === 'terreno' ? TERRENO.limiteMax : banco.limiteMax;
+
+                html += '<div class="suggestions"><h4>COMO RESOLVER (em números)</h4><ul>';
+
+                // Causa: entrada abaixo da cota (LTV)
                 if (entradaTotal < entradaNecessaria) {
-                    html += '<li>Aumente a entrada em R$ ' + formatMoney(entradaNecessaria - entradaTotal) + ' (use FGTS adicional ou poupança)</li>';
+                    const faltaLtv = entradaNecessaria - entradaTotal;
+                    html += '<li><strong>Entrada mínima:</strong> este banco financia até ' + ltv + '%, então a entrada precisa ser <strong>R$ ' + formatMoney(entradaNecessaria) + '</strong> — faltam <strong>R$ ' + formatMoney(faltaLtv) + '</strong>' + (tipoImovel !== 'terreno' ? ' (dá para usar FGTS)' : '') + '.</li>';
                 }
+
+                // Causa: parcela acima de 30% da renda
                 if (comprometimento > 30) {
-                    html += '<li>Reduza o valor financiado ou aumente o prazo para diminuir a parcela</li>';
-                    html += '<li>Considere composição de renda com cônjuge ou familiar</li>';
+                    html += '<li><strong>Parcela adequada:</strong> para caber nos 30% da sua renda, a 1ª parcela precisa ficar em até <strong>R$ ' + formatMoney(parcelaMax) + '</strong> — hoje ela está em R$ ' + formatMoney(parcelaInicial) + '.</li>';
+
+                    // Solução pela entrada
+                    const maxVF = maxFinanciadoPara(parcelaMax, prazo, taxaMensalR, sistema);
+                    const entradaCaber = valorImovel - maxVF;
+                    const extra = entradaCaber - entradaTotal;
+                    if (maxVF > 0 && extra > 0) {
+                        html += '<li><strong>Resolvendo pela entrada:</strong> com entrada de <strong>R$ ' + formatMoney(entradaCaber) + '</strong> (mais R$ ' + formatMoney(extra) + '), o financiado cai para R$ ' + formatMoney(maxVF) + ' e a parcela entra nos 30%.</li>';
+                    }
+
+                    // Solução pelo prazo (SAC)
+                    if (sistema === 'SAC') {
+                        const denom = parcelaMax - valorFinanciado * taxaMensalR;
+                        if (denom > 0) {
+                            const prazoNec = Math.ceil(valorFinanciado / denom);
+                            if (prazoNec > prazo && prazoNec <= (tipoImovel === 'terreno' ? TERRENO.prazoMax : banco.prazoMax)) {
+                                html += '<li><strong>Resolvendo pelo prazo:</strong> aumentando para <strong>' + prazoNec + ' meses (' + Math.round(prazoNec / 12) + ' anos)</strong>, a parcela cabe sem aumentar a entrada.</li>';
+                            }
+                        }
+                    }
+
+                    // SAC não passou, mas PRICE passaria
+                    if (sistema === 'SAC') {
+                        const parcPrice = parcelaInicialDe(valorFinanciado, prazo, taxaMensalR, 'PRICE');
+                        if (parcPrice > 0 && parcPrice <= parcelaMax) {
+                            html += '<li><strong>Por que o SAC não passou e o PRICE passaria:</strong> no SAC a 1ª parcela é a <strong>maior</strong> (R$ ' + formatMoney(parcelaInicial) + '), porque os juros incidem sobre o saldo cheio e vão caindo. No <strong>PRICE</strong> a parcela é fixa e começa menor: <strong>R$ ' + formatMoney(parcPrice) + '</strong> — já dentro dos 30%. Basta trocar o sistema para PRICE e simular.</li>';
+                        }
+                    }
+
+                    html += '<li>Ou <strong>componha renda</strong> com cônjuge/familiar para elevar o limite dos 30%.</li>';
                 }
-                if (valorImovel > banco.limiteMax) {
-                    html += '<li>Escolha um imóvel de até R$ ' + formatMoney(banco.limiteMax) + '</li>';
+
+                // Causa: valor acima do limite da modalidade
+                if (valorImovel > limiteExib) {
+                    html += '<li><strong>Limite da modalidade:</strong> escolha um ' + (tipoImovel === 'terreno' ? 'terreno' : 'imóvel') + ' de até <strong>R$ ' + formatMoney(limiteExib) + '</strong>.</li>';
                 }
                 html += '</ul></div>';
 
@@ -1414,7 +1453,6 @@
                 '• Valor financiado: R$ ' + formatMoney(r.valorFinanciado),
                 '• Primeira parcela: R$ ' + formatMoney(r.parcelaInicial),
                 '• Última parcela: R$ ' + formatMoney(r.parcelaFinal),
-                '• Total a pagar: R$ ' + formatMoney(r.totalPago),
                 '',
                 'Quero conversar sobre esse financiamento!'
             ];
@@ -1425,6 +1463,25 @@
 
         function nomeTipo(t) {
             return t === 'novo' ? 'Novo' : t === 'usado' ? 'Usado' : 'Terreno';
+        }
+
+        // 1ª parcela de um financiamento (SAC ou PRICE)
+        function parcelaInicialDe(vf, prazo, taxaMensal, sistema) {
+            if (vf <= 0 || prazo <= 0) return 0;
+            if (sistema === 'SAC') return vf / prazo + vf * taxaMensal;
+            const pot = Math.pow(1 + taxaMensal, prazo);
+            return vf * (taxaMensal * pot) / (pot - 1);
+        }
+
+        // Maior valor financiável para que a 1ª parcela caiba num teto (ex.: 30% da renda)
+        function maxFinanciadoPara(parcelaMax, prazo, taxaMensal, sistema) {
+            if (parcelaMax <= 0 || prazo <= 0) return 0;
+            if (sistema === 'SAC') {
+                const denom = 1 / prazo + taxaMensal;
+                return denom > 0 ? parcelaMax / denom : 0;
+            }
+            const pot = Math.pow(1 + taxaMensal, prazo);
+            return parcelaMax * (pot - 1) / (taxaMensal * pot);
         }
 
         function formatMoney(value) {

@@ -590,7 +590,7 @@
             <span class="logo-creci">CRECI 39020F · Brusque/SC</span>
             <h1>Calculadora de Financiamento Imobiliário</h1>
             <p class="subtitle">Parâmetros atualizados · Junho 2026 · 10 instituições financeiras</p>
-            <p class="subtitle" style="margin-top:4px; font-size:12px;">Última verificação dos bancos: <span id="dataVerificacao">20/07/2026</span></p>
+            <p class="subtitle" style="margin-top:4px; font-size:12px;">Última verificação dos bancos: <span id="dataVerificacao">20/07/2026</span> <span style="opacity:.7">· terreno multi-banco</span></p>
         </div>
 
         <div class="content">
@@ -726,7 +726,7 @@
         const BANCOS = {
             CAIXA: {
                 nome: 'Caixa Econômica Federal', taxa: 11.19, ltvNovo: 90, ltvUsado: 80,
-                prazoMax: 420, limiteMax: 2250000, mcmv: true, renda_min: 0, terreno: true,
+                prazoMax: 420, limiteMax: 2250000, mcmv: true, renda_min: 0, terreno: true, terrenoLtv: 80,
                 detalhes: {
                     tipo_taxa: 'TR',
                     mcmv_info: 'Principal operador MCMV — F1: 4,00-4,25% | F2: 4,75-7,00% | F3: 8,16% | F4: 10,00%',
@@ -745,7 +745,7 @@
             },
             BRADESCO: {
                 nome: 'Bradesco', taxa: 11.70, ltvNovo: 80, ltvUsado: 80,
-                prazoMax: 420, limiteMax: 2250000, mcmv: false, renda_min: 0,
+                prazoMax: 420, limiteMax: 2250000, mcmv: false, renda_min: 0, terreno: true, terrenoLtv: 70,
                 detalhes: { tipo_taxa: 'TR ou Poupança Mais', mcmv_info: 'Não confirmado', diferenciais: 'Pula Parcela (1x/ano), financia custos de cartório' }
             },
             SANTANDER: {
@@ -773,7 +773,7 @@
             },
             SICOOB: {
                 nome: 'Sicoob', taxa: 10.50, ltvNovo: 90, ltvUsado: 80,
-                prazoMax: 420, limiteMax: 1500000, mcmv: true, renda_min: 0,
+                prazoMax: 420, limiteMax: 1500000, mcmv: true, renda_min: 0, terreno: true, terrenoLtv: 80,
                 detalhes: { tipo_taxa: 'Varia por cooperativa', mcmv_info: 'Participa do MCMV', ltv_pro_cotista: 'Pró-Cotista SAC: até 90%', diferenciais: 'Cooperativa, composição de renda até 3 pessoas' }
             },
             VIACREDI: {
@@ -872,7 +872,7 @@
                 return '<div class="mcmv-banner">' +
                     '<span class="faixa-tag">Terreno · Lote Urbanizado</span>' +
                     '<h4>Terreno tem regras próprias</h4>' +
-                    '<p>Financia até <strong>80%</strong> (entrada mínima de 20%) · Prazo máximo: <strong>20 anos</strong> · <strong>Sem FGTS</strong> · Fora do MCMV · Sistema <strong>SAC/TR</strong> · Juros ~<strong>12,73% a.a.</strong> — condições confirmadas no simulador oficial da Caixa.</p>' +
+                    '<p>Cota varia por banco: <strong>Caixa e Sicoob até 80%</strong>, <strong>Bradesco 70%</strong> · Prazo máximo: <strong>20 anos</strong> · <strong>Sem FGTS</strong> · Fora do MCMV · Sistema <strong>SAC/TR</strong> · Juros ~<strong>12,73% a.a.</strong> (referência Caixa). Cooperativas (Viacredi/Ailos, Sicredi) também operam terreno — o Cal confirma as condições.</p>' +
                     avisos +
                     '<p style="margin-top:10px;"><strong>Dica do Cal:</strong> comprando <strong>terreno + construção</strong> em um contrato único, você volta a financiar até 80% do total, usar FGTS e pode até enquadrar no MCMV.</p>' +
                     '</div>';
@@ -1144,7 +1144,7 @@
             // Parâmetros efetivos conforme o tipo (terreno tem regras próprias)
             let ltv, prazoMaxEfetivo, limiteEfetivo;
             if (ehTerreno) {
-                ltv = TERRENO.ltv;
+                ltv = banco.terrenoLtv || TERRENO.ltv;
                 prazoMaxEfetivo = TERRENO.prazoMax;
                 limiteEfetivo = TERRENO.limiteMax;
             } else {
@@ -1161,10 +1161,12 @@
 
             if (ehTerreno && !banco.terreno) {
                 aprovado = false;
-                motivos.push('Linha de financiamento de terreno/lote urbanizado não confirmada neste banco — o Cal indica as alternativas disponíveis');
+                motivos.push('Terreno: condições não parametrizadas aqui para este banco — fale com o Cal (cooperativas como Viacredi/Ailos e Sicredi operam terreno via linha SFI, com parâmetros próprios)');
             }
 
-            const entradaNecessaria = valorImovel * (1 - ltv / 100);
+            // Arredonda aos centavos para evitar erro de ponto flutuante na entrada-limite
+            // (ex.: 1 - 70/100 = 0,30000000004, que reprovaria uma entrada exatamente mínima).
+            const entradaNecessaria = Math.round(valorImovel * (1 - ltv / 100) * 100) / 100;
             if (entradaTotal < entradaNecessaria) {
                 aprovado = false;
                 const falta = entradaNecessaria - entradaTotal;
@@ -1256,7 +1258,7 @@
                 html += '<div class="approval-notice"><h5>Aprovação baseada em critérios públicos</h5>' +
                     '<p>O banco poderá aprovar um percentual menor que ' + ltv + '% conforme análise individual de crédito, score e histórico. Confirme o percentual real para o seu perfil.</p></div>';
                 if (tipoImovel === 'terreno') {
-                    html += '<div class="warning-box"><strong>Modalidade lote urbanizado:</strong> juros nominais de ~12,73% a.a. + TR (efetivos ~13,50%), conforme o simulador oficial da Caixa — o Cal confirma a taxa exata para o seu perfil.</div>';
+                    html += '<div class="warning-box"><strong>Modalidade lote urbanizado:</strong> parcela calculada com taxa de referência de ~12,73% a.a. + TR (padrão Caixa). Cada banco define a sua taxa de terreno — o Cal confirma a taxa exata do banco escolhido.</div>';
                 }
                 // Botão WhatsApp por banco aprovado
                 html += '<button class="btn-whatsapp" onclick="enviarParaCal(\'' + codigo + '\')">' +

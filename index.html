@@ -614,13 +614,29 @@
         .print-only { display: none; }
         .print-rodape { margin-top: 18px; font-size: 11px; color: var(--cinza); text-align: center; line-height: 1.5; }
 
+        /* Ficha da simulação (comprovante) */
+        .ficha { width: 100%; border-collapse: collapse; margin: 4px 0 16px; }
+        .ficha td { padding: 9px 12px; border-bottom: 1px solid var(--cinza-claro); font-size: 13.5px; }
+        .ficha tr:last-child td { border-bottom: none; }
+        .ficha-lbl { color: var(--cinza); width: 48%; }
+        .ficha-val { color: var(--terra-escuro); font-weight: 600; text-align: right; }
+        .ficha-val.destaque { color: var(--terra-medio); }
+        .ficha-val.verde { color: var(--aprovado-escuro); }
+
+        .chk-pdf-wrap {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: var(--terra-medio); font-weight: 600;
+            margin-bottom: 12px; cursor: pointer;
+        }
+        .chk-pdf-wrap input { width: 16px; height: 16px; accent-color: var(--terra-medio); cursor: pointer; }
+
         @media print {
             @page { margin: 12mm; }
             body { background: #fff !important; padding: 0; }
             .container { box-shadow: none; border-radius: 0; max-width: 100%; }
             /* esconde tudo que não faz parte do comprovante */
             .mode-selector, .form-section, .footer, .modal-overlay, .btn-whatsapp,
-            .approval-notice, .no-print { display: none !important; }
+            .approval-notice, .no-print, .bank-card.nao-imprimir { display: none !important; }
             .print-only { display: block !important; }
             /* cabeçalho da marca em versão clara (economiza tinta e fica legível) */
             .header { background: #fff !important; border-bottom: 2px solid var(--terra-medio); padding: 8px 0 12px; }
@@ -744,7 +760,7 @@
         </div>
 
         <div class="footer">
-            <span class="nome">Cal Oliveiras</span>
+            <span class="nome">Carlos Oliveiras</span>
             Corretor Particular · CRECI 39020F · Brusque/SC<br>
             <a href="https://wa.me/5547999001754" target="_blank">WhatsApp: (47) 99900-1754</a>
         </div>
@@ -1195,7 +1211,7 @@
                 ' · Renda R$ ' + formatMoney(renda) + ' · Prazo ' + anosTxt + ' · ' + sistema + '</div>' +
                 '</div>';
             html += corpo;
-            html += '<div class="print-rodape print-only">Cal Oliveiras · Corretor Particular · CRECI 39020F · Brusque/SC · WhatsApp (47) 99900-1754<br>Simulação de referência, com critérios públicos dos bancos — sujeita à análise e aprovação da instituição.</div>';
+            html += '<div class="print-rodape print-only"><strong>Carlos Oliveiras</strong> · Corretor Particular · CRECI 39020F · Brusque/SC · WhatsApp (47) 99900-1754<br>Este documento é uma simulação de referência, calculada com critérios públicos e parâmetros médios de mercado. Os valores definitivos — taxas, prazos, cota e a documentação exigida — só podem ser confirmados diretamente com a instituição financeira escolhida, após análise de crédito e avaliação do imóvel. Faça contato direto para uma condução pontual da sua situação.</div>';
 
             document.getElementById('results').innerHTML = html;
         }
@@ -1382,32 +1398,50 @@
                 '<div class="status-badge ' + (aprovado ? 'approved' : 'rejected') + '">' + (aprovado ? 'APROVADO' : 'REPROVADO') + '</div>' +
                 '</div>';
 
-            html += '<div class="bank-details">' +
-                '<div class="detail-item"><div class="detail-label">Taxa Nominal</div><div class="detail-value">' + (taxaAplicada || banco.taxa).toFixed(2) + '% a.a. + ' + (tipoImovel === 'terreno' ? 'TR' : banco.detalhes.tipo_taxa) + '</div></div>' +
-                '<div class="detail-item"><div class="detail-label">CET (estimado)</div><div class="detail-value">' + cetEstimado.toFixed(2) + '% a.a.</div></div>' +
-                '<div class="detail-item"><div class="detail-label">LTV (' + tipoImovel + ')</div><div class="detail-value">' + ltv + '%</div></div>' +
-                '<div class="detail-item"><div class="detail-label">Prazo Máximo</div><div class="detail-value">' + banco.prazoMax + ' meses</div></div>' +
-                '<div class="detail-item"><div class="detail-label">Limite Máximo</div><div class="detail-value">R$ ' + formatMoney(banco.limiteMax) + '</div></div>';
-
             if (aprovado) {
-                html += '<div class="detail-item"><div class="detail-label">Valor Financiado</div><div class="detail-value destaque">R$ ' + formatMoney(valorFinanciado) + '</div></div>' +
-                    '<div class="detail-item"><div class="detail-label">1ª Parcela (' + sistema + ')</div><div class="detail-value verde">R$ ' + formatMoney(parcelaInicial) + '</div></div>' +
-                    '<div class="detail-item"><div class="detail-label">Última Parcela (menor)</div><div class="detail-value">R$ ' + formatMoney(parcelaFinal) + '</div></div>' +
-                    '<div class="detail-item"><div class="detail-label">Comprometimento</div><div class="detail-value">' + comprometimento.toFixed(1) + '%</div></div>';
-            }
-            html += '</div>';
+                // Checkbox: o usuário escolhe se esta opção entra no PDF
+                html += '<label class="chk-pdf-wrap no-print"><input type="checkbox" class="chk-pdf" checked onchange="this.closest(\'.bank-card\').classList.toggle(\'nao-imprimir\', !this.checked)"> Incluir esta opção no PDF</label>';
 
-            if (aprovado) {
+                // Ficha da Simulação (estilo comprovante) — vai na tela e no PDF
+                const labelValorImovel = tipoImovel === 'terreno' ? 'Valor do terreno' : tipoImovel === 'construir' ? 'Valor total (terreno + obra)' : 'Valor do imóvel';
+                const prazoMaxExib = tipoImovel === 'terreno' ? TERRENO.prazoMax : banco.prazoMax;
+                const indexador = tipoImovel === 'terreno' ? 'TR' : banco.detalhes.tipo_taxa;
+                const s = ultimaSimulacao || {};
+                const entradaTxt = 'R$ ' + formatMoney(entradaTotal) + ((s.fgts > 0 && tipoImovel !== 'terreno') ? ' (inclui FGTS R$ ' + formatMoney(s.fgts) + ')' : '');
+                const anosEsc = Number.isInteger(prazo / 12) ? ' (' + (prazo / 12) + ' anos)' : '';
+
+                html += '<table class="ficha">' +
+                    '<tr><td class="ficha-lbl">Modalidade</td><td class="ficha-val">' + nomeTipo(tipoImovel) + '</td></tr>' +
+                    '<tr><td class="ficha-lbl">' + labelValorImovel + '</td><td class="ficha-val">R$ ' + formatMoney(valorImovel) + '</td></tr>' +
+                    '<tr><td class="ficha-lbl">Valor da entrada</td><td class="ficha-val">' + entradaTxt + '</td></tr>' +
+                    '<tr><td class="ficha-lbl">Cota máxima do financiamento</td><td class="ficha-val">' + ltv + '%</td></tr>' +
+                    '<tr><td class="ficha-lbl">Valor financiado</td><td class="ficha-val destaque">R$ ' + formatMoney(valorFinanciado) + '</td></tr>' +
+                    '<tr><td class="ficha-lbl">Prazo escolhido</td><td class="ficha-val">' + prazo + ' meses' + anosEsc + '</td></tr>' +
+                    '<tr><td class="ficha-lbl">Prazo máximo</td><td class="ficha-val">' + prazoMaxExib + ' meses</td></tr>' +
+                    '<tr><td class="ficha-lbl">Sistema de amortização</td><td class="ficha-val">' + sistema + ' + ' + indexador + '</td></tr>' +
+                    '<tr><td class="ficha-lbl">Juros nominais</td><td class="ficha-val">' + (taxaAplicada || banco.taxa).toFixed(2) + '% a.a.</td></tr>' +
+                    '<tr><td class="ficha-lbl">Juros efetivos (CET' + (tipoImovel === 'terreno' ? '' : ' estimado') + ')</td><td class="ficha-val">' + cetEstimado.toFixed(2) + '% a.a.</td></tr>' +
+                    '<tr><td class="ficha-lbl">1ª prestação</td><td class="ficha-val verde">R$ ' + formatMoney(parcelaInicial) + '</td></tr>' +
+                    '<tr><td class="ficha-lbl">Última prestação</td><td class="ficha-val">R$ ' + formatMoney(parcelaFinal) + '</td></tr>' +
+                    '</table>';
+
                 html += '<div class="warning-box" style="border-left-color: var(--aprovado-vivo);"><strong>💡 Bom saber:</strong> você não precisa pagar até o fim. Amortizando ou quitando antes do prazo, você <strong>abate juros</strong> — e no SAC a parcela ainda diminui todo mês.</div>';
-                html += '<div class="approval-notice"><h5>Aprovação baseada em critérios públicos</h5>' +
+                html += '<div class="approval-notice no-print"><h5>Aprovação baseada em critérios públicos</h5>' +
                     '<p>O banco poderá aprovar um percentual menor que ' + ltv + '% conforme análise individual de crédito, score e histórico. Confirme o percentual real para o seu perfil.</p></div>';
                 if (tipoImovel === 'terreno') {
-                    html += '<div class="warning-box"><strong>Modalidade lote urbanizado:</strong> parcela calculada com taxa de referência de ~12,73% a.a. + TR (padrão Caixa). Cada banco define a sua taxa de terreno — o Cal confirma a taxa exata do banco escolhido.</div>';
+                    html += '<div class="warning-box"><strong>Modalidade lote urbanizado:</strong> parcela calculada com taxa de referência de ~12,73% a.a. + TR (padrão Caixa). Cada banco define a sua taxa de terreno — confirme a taxa exata do banco escolhido.</div>';
                 }
-                // Botão WhatsApp por banco aprovado
-                html += '<button class="btn-whatsapp" onclick="enviarParaCal(\'' + codigo + '\')">' +
+                html += '<button class="btn-whatsapp no-print" onclick="enviarParaCal(\'' + codigo + '\')">' +
                     '<svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.8-2.8-1.5-3.9-3.4-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 1.9.8 2.6.9 3.5.8.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"/></svg>' +
-                    'Enviar essa simulação para o Cal</button>';
+                    'Receba mais informações</button>';
+            } else {
+                html += '<div class="bank-details">' +
+                    '<div class="detail-item"><div class="detail-label">Taxa Nominal</div><div class="detail-value">' + (taxaAplicada || banco.taxa).toFixed(2) + '% a.a. + ' + (tipoImovel === 'terreno' ? 'TR' : banco.detalhes.tipo_taxa) + '</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">CET (estimado)</div><div class="detail-value">' + cetEstimado.toFixed(2) + '% a.a.</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">Cota máxima</div><div class="detail-value">' + ltv + '%</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">Prazo Máximo</div><div class="detail-value">' + (tipoImovel === 'terreno' ? TERRENO.prazoMax : banco.prazoMax) + ' meses</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">Limite Máximo</div><div class="detail-value">R$ ' + formatMoney(tipoImovel === 'terreno' ? TERRENO.limiteMax : banco.limiteMax) + '</div></div>' +
+                    '</div>';
             }
 
             if (mostrarDetalhes) {

@@ -173,30 +173,28 @@
 
         /* Toggle Novo/Usado */
         .tipo-toggle {
-            display: flex;
-            gap: 0;
-            border: 1.5px solid var(--cinza-claro);
-            border-radius: 8px;
-            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
         }
 
         .tipo-option {
-            flex: 1;
-            padding: 8px 6px;
+            padding: 7px 6px;
             text-align: center;
             cursor: pointer;
             background: var(--branco);
+            border: 1.5px solid var(--cinza-claro);
+            border-radius: 7px;
             transition: all 0.2s ease;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--cinza);
         }
-
-        .tipo-option:not(:last-child) { border-right: 1.5px solid var(--cinza-claro); }
 
         .tipo-option.active {
             background: var(--terra-medio);
             color: var(--branco);
+            border-color: var(--terra-medio);
         }
 
         .form-grid {
@@ -601,6 +599,7 @@
                         <div class="tipo-option active" data-tipo="novo">Novo</div>
                         <div class="tipo-option" data-tipo="usado">Usado</div>
                         <div class="tipo-option" data-tipo="terreno">Terreno</div>
+                        <div class="tipo-option" data-tipo="construir">Construir</div>
                     </div>
                 </div>
                 <div class="mode-btn active" data-mode="inteligente">
@@ -621,7 +620,7 @@
                 <h3>Dados do Financiamento</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Valor do Imóvel</label>
+                        <label id="labelValor">Valor do Imóvel</label>
                         <input type="text" id="valorImovel" inputmode="numeric" placeholder="R$ 350.000" value="R$ 350.000">
                     </div>
                     <div class="form-group">
@@ -832,6 +831,12 @@
                 document.querySelectorAll('.tipo-option').forEach(o => o.classList.remove('active'));
                 this.classList.add('active');
                 tipoImovel = this.dataset.tipo;
+                const lbl = document.getElementById('labelValor');
+                if (lbl) {
+                    lbl.textContent = tipoImovel === 'terreno' ? 'Valor do Terreno'
+                        : tipoImovel === 'construir' ? 'Valor total (terreno + obra)'
+                        : 'Valor do Imóvel';
+                }
             });
         });
 
@@ -876,6 +881,25 @@
                     avisos +
                     '<p style="margin-top:10px;"><strong>Dica do Cal:</strong> comprando <strong>terreno + construção</strong> em um contrato único, você volta a financiar até 80% do total, usar FGTS e pode até enquadrar no MCMV.</p>' +
                     '</div>';
+            }
+
+            // Terreno + Construção (inclui construção em terreno próprio)
+            if (tipo === 'construir') {
+                let nota = '<div class="mcmv-banner">' +
+                    '<span class="faixa-tag">Terreno + Construção</span>' +
+                    '<h4>Modalidade construção — mais vantajosa</h4>' +
+                    '<p>Financia até <strong>80% do total</strong> (terreno + obra) · <strong>Pode usar FGTS</strong> · Prazo até <strong>35 anos</strong> · Pode enquadrar no <strong>MCMV</strong>.</p>' +
+                    '<p style="margin-top:10px;"><strong>Já tem o terreno?</strong> O valor dele conta como entrada — some ao campo "Entrada". Se o terreno vale 20% ou mais do total, dá para financiar 100% da obra.</p>' +
+                    '</div>';
+                const fx = avaliarMCMV(renda, valorImovel, tipo);
+                if (fx) {
+                    nota += '<div class="mcmv-banner ' + (fx.faixa === 4 ? 'destaque-f4' : '') + '">' +
+                        '<span class="faixa-tag">MCMV · Faixa ' + fx.faixa + '</span>' +
+                        '<h4>E ainda pode entrar no Minha Casa Minha Vida</h4>' +
+                        '<p><strong>Renda até R$ ' + formatMoney(fx.rendaMax) + '/mês</strong> · Teto R$ ' + formatMoney(fx.tetoImovel) + ' · ' + fx.subsidio + '</p>' +
+                        '</div>';
+                }
+                return nota;
             }
 
             const faixa = avaliarMCMV(renda, valorImovel, tipo);
@@ -1010,7 +1034,7 @@
                 nome: nome,
                 telefone: telefone,
                 origem: 'Calculadora de Financiamento',
-                tipoInteresse: s.tipo === 'terreno' ? 'Financiamento - Terreno' : 'Financiamento - Imovel ' + nomeTipo(s.tipo),
+                tipoInteresse: s.tipo === 'terreno' ? 'Financiamento - Terreno' : s.tipo === 'construir' ? 'Financiamento - Terreno + Construcao' : 'Financiamento - Imovel ' + nomeTipo(s.tipo),
                 orcamento: s.valorImovel,
                 funil: 'Novo Lead',
                 temperatura: algumAprovado ? 'Quente' : 'Morno',
@@ -1064,7 +1088,7 @@
             return '<div class="info-disclaimer">' +
                 '<h4>Leia antes de consultar os bancos</h4>' +
                 '<p>Esta simulação utiliza os <strong>critérios máximos públicos</strong> de cada banco para ' +
-                (tipoImovel === 'terreno' ? '<strong>terreno (lote urbanizado)</strong>' : 'imóvel <strong>' + (tipoImovel === 'novo' ? 'novo' : 'usado') + '</strong>') + '. Na prática, o percentual aprovado pode ser menor conforme:</p>' +
+                (tipoImovel === 'terreno' ? '<strong>terreno (lote urbanizado)</strong>' : tipoImovel === 'construir' ? '<strong>terreno + construção</strong>' : 'imóvel <strong>' + (tipoImovel === 'novo' ? 'novo' : 'usado') + '</strong>') + '. Na prática, o percentual aprovado pode ser menor conforme:</p>' +
                 '<ul>' +
                 '<li><strong>Score de crédito</strong> e histórico de pagamentos</li>' +
                 '<li><strong>Relacionamento bancário</strong> e movimentação financeira</li>' +
@@ -1147,6 +1171,10 @@
                 ltv = banco.terrenoLtv || TERRENO.ltv;
                 prazoMaxEfetivo = TERRENO.prazoMax;
                 limiteEfetivo = TERRENO.limiteMax;
+            } else if (tipoImovel === 'construir') {
+                ltv = 80; // terreno + construção: até 80% do total (terreno + obra)
+                prazoMaxEfetivo = banco.prazoMax;
+                limiteEfetivo = banco.limiteMax;
             } else {
                 ltv = (tipoImovel === 'novo') ? banco.ltvNovo : banco.ltvUsado;
                 prazoMaxEfetivo = banco.prazoMax;
@@ -1462,7 +1490,7 @@
         }
 
         function nomeTipo(t) {
-            return t === 'novo' ? 'Novo' : t === 'usado' ? 'Usado' : 'Terreno';
+            return t === 'novo' ? 'Novo' : t === 'usado' ? 'Usado' : t === 'construir' ? 'Terreno + Construção' : 'Terreno';
         }
 
         // 1ª parcela de um financiamento (SAC ou PRICE)

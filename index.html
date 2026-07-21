@@ -230,6 +230,18 @@
             border-color: var(--terra-medio);
         }
 
+        .renda-hint {
+            display: block;
+            margin-top: 6px;
+            font-size: 11.5px;
+            font-style: italic;
+            color: var(--cinza);
+            opacity: 0.7;
+            min-height: 15px;
+            transition: opacity 0.2s ease;
+        }
+        .renda-hint strong { color: var(--terra-medio); opacity: 1; font-style: normal; }
+
         .section-label {
             font-family: 'Outfit', sans-serif;
             font-size: 19px;
@@ -691,6 +703,7 @@
                     <div class="form-group">
                         <label>Renda Mensal Bruta</label>
                         <input type="text" id="renda" inputmode="numeric" placeholder="R$ 8.000" value="R$ 8.000">
+                        <small id="rendaIdeal" class="renda-hint"></small>
                     </div>
                     <div class="form-group">
                         <label>Prazo (meses)</label>
@@ -868,8 +881,37 @@
 
         ['valorImovel', 'entrada', 'fgts', 'renda'].forEach(id => {
             const el = document.getElementById(id);
-            el.addEventListener('input', function () { aplicarMascaraDinheiro(this); });
+            el.addEventListener('input', function () { aplicarMascaraDinheiro(this); atualizarRendaIdeal(); });
         });
+        ['prazo', 'sistema'].forEach(id => {
+            document.getElementById(id).addEventListener('input', atualizarRendaIdeal);
+            document.getElementById(id).addEventListener('change', atualizarRendaIdeal);
+        });
+
+        // Mostra, de forma discreta, a renda ideal para a parcela caber em 30% da renda
+        // (taxa de referência: Caixa 11,19% / terreno 12,73%). Atualiza ao vivo.
+        function atualizarRendaIdeal() {
+            const el = document.getElementById('rendaIdeal');
+            if (!el) return;
+            const valor = removerMascara(document.getElementById('valorImovel').value);
+            if (valor <= 0) { el.innerHTML = ''; return; }
+            const entrada = removerMascara(document.getElementById('entrada').value);
+            const fgts = removerMascara(document.getElementById('fgts').value);
+            let prazo = parseInt(document.getElementById('prazo').value) || 360;
+            const sistema = document.getElementById('sistema').value;
+
+            const ehTerreno = tipoImovel === 'terreno';
+            if (ehTerreno && prazo > TERRENO.prazoMax) prazo = TERRENO.prazoMax;
+            const entradaTotal = ehTerreno ? entrada : entrada + fgts;
+            const vf = valor - entradaTotal;
+            if (vf <= 0) { el.innerHTML = 'Entrada cobre o valor — sem financiamento.'; return; }
+
+            const taxaRef = (ehTerreno ? TERRENO.taxaNominal : 11.19) / 100 / 12;
+            const parcela = parcelaInicialDe(vf, prazo, taxaRef, sistema);
+            const rendaIdeal = parcela / 0.30;
+            el.innerHTML = 'Renda ideal para este valor: <strong>~R$ ' + formatMoney(rendaIdeal) + '</strong>';
+        }
+        atualizarRendaIdeal(); // cálculo inicial ao carregar
 
         /* ============ MÁSCARA DE TELEFONE ============ */
         function aplicarMascaraTelefone(input) {
@@ -894,6 +936,7 @@
                         : tipoImovel === 'construir' ? 'Valor total (terreno + obra)'
                         : 'Valor do Imóvel';
                 }
+                atualizarRendaIdeal();
             });
         });
 

@@ -630,6 +630,38 @@
         }
         .chk-pdf-wrap input { width: 16px; height: 16px; accent-color: var(--terra-medio); cursor: pointer; }
 
+        /* Caixa colapsável (accordion) */
+        .caixa-colapsavel {
+            border: 1px solid var(--cinza-claro);
+            border-radius: 10px;
+            background: #f7f6f1;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .caixa-colapsavel > summary {
+            cursor: pointer;
+            padding: 13px 18px;
+            font-weight: 600;
+            color: var(--terra-medio);
+            font-size: 14px;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .caixa-colapsavel > summary::-webkit-details-marker { display: none; }
+        .caixa-colapsavel > summary::after { content: '⌄'; font-size: 20px; line-height: 1; transition: transform 0.2s ease; }
+        .caixa-colapsavel[open] > summary::after { transform: rotate(180deg); }
+        .colapsavel-corpo { padding: 2px 18px 16px; font-size: 13.5px; color: var(--terra-escuro); line-height: 1.6; }
+        .colapsavel-corpo h4 { color: var(--terra-medio); font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .colapsavel-corpo p { margin-bottom: 8px; }
+        .colapsavel-corpo ul { list-style: none; margin: 8px 0; }
+        .colapsavel-corpo li { padding: 4px 0 4px 20px; position: relative; }
+        .colapsavel-corpo li:before { content: "•"; position: absolute; left: 6px; color: var(--terra-medio); }
+        .colapsavel-corpo strong { color: var(--terra-medio); }
+        .colapsavel-corpo .faixa-tag { display: inline-block; background: var(--terra-medio); color: var(--branco); font-weight: 700; padding: 3px 12px; border-radius: 20px; font-size: 13px; margin-bottom: 8px; }
+
         @media print {
             @page { margin: 12mm; }
             body { background: #fff !important; padding: 0; }
@@ -637,7 +669,7 @@
             /* esconde tudo que não faz parte do comprovante */
             .mode-selector, .form-section, .footer, .modal-overlay, .btn-whatsapp,
             .approval-notice, .no-print, .bank-card.nao-imprimir { display: none !important; }
-            .print-only { display: block !important; }
+            .print-only { display: revert !important; }
             /* cabeçalho da marca em versão clara (economiza tinta e fica legível) */
             .header { background: #fff !important; border-bottom: 2px solid var(--terra-medio); padding: 8px 0 12px; }
             .header .logo-name, .header h1 { color: var(--preto) !important; }
@@ -672,8 +704,6 @@
             <div class="logo-sub">Corretor Particular</div>
             <span class="logo-creci">CRECI 39020F · Brusque/SC</span>
             <h1>Calculadora de Financiamento Imobiliário</h1>
-            <p class="subtitle">Parâmetros atualizados · Junho 2026 · 10 instituições financeiras</p>
-            <p class="subtitle" style="margin-top:4px; font-size:12px;">Última verificação dos bancos: <span id="dataVerificacao">20/07/2026</span> <span style="opacity:.7">· terreno multi-banco</span></p>
         </div>
 
         <div class="content">
@@ -762,7 +792,8 @@
         <div class="footer">
             <span class="nome">Carlos Oliveiras</span>
             Corretor Particular · CRECI 39020F · Brusque/SC<br>
-            <a href="https://wa.me/5547999001754" target="_blank">WhatsApp: (47) 99900-1754</a>
+            <a href="https://wa.me/5547999001754" target="_blank">WhatsApp: (47) 99900-1754</a><br>
+            <span style="font-size:11px; opacity:.55;">Parâmetros verificados em <span id="dataVerificacao">20/07/2026</span></span>
         </div>
     </div>
 
@@ -984,38 +1015,39 @@
             if (tipo === 'terreno') {
                 const s = ultimaSimulacao || {};
                 let avisos = '';
+                let temAvisos = false;
                 if ((s.fgts || 0) > 0) {
-                    avisos += '<p style="margin-top:10px;"><strong>Atenção:</strong> o FGTS informado (R$ ' + formatMoney(s.fgts) + ') <strong>não entrou</strong> na conta — a lei não permite usar FGTS para comprar terreno isolado.</p>';
+                    temAvisos = true;
+                    avisos += '<p><strong>Atenção:</strong> o FGTS informado (R$ ' + formatMoney(s.fgts) + ') <strong>não entrou</strong> na conta — a lei não permite usar FGTS para comprar terreno isolado.</p>';
                 }
                 if (s.prazoAjustado) {
-                    avisos += '<p style="margin-top:10px;"><strong>Prazo ajustado:</strong> o máximo para terreno é <strong>240 meses (20 anos)</strong> — a simulação já usa esse limite.</p>';
+                    temAvisos = true;
+                    avisos += '<p><strong>Prazo ajustado:</strong> o máximo para terreno é <strong>240 meses (20 anos)</strong> — a simulação já usa esse limite.</p>';
                 }
-                return '<div class="mcmv-banner">' +
+                const conteudo =
                     '<span class="faixa-tag">Terreno · Lote Urbanizado</span>' +
-                    '<h4>Terreno tem regras próprias</h4>' +
-                    '<p>Cota varia por banco: <strong>Caixa e Sicoob até 80%</strong>, <strong>Bradesco 70%</strong> · Prazo máximo: <strong>20 anos</strong> · <strong>Sem FGTS</strong> · Fora do MCMV · Sistema <strong>SAC/TR</strong> · Juros ~<strong>12,73% a.a.</strong> (referência Caixa). Cooperativas (Viacredi/Ailos, Sicredi) também operam terreno — o Cal confirma as condições.</p>' +
+                    '<p>Cota varia por banco: <strong>Caixa e Sicoob até 80%</strong>, <strong>Bradesco 70%</strong> · Prazo máx.: <strong>20 anos</strong> · <strong>Sem FGTS</strong> · Fora do MCMV · Sistema <strong>SAC/TR</strong> · Juros ~<strong>12,73% a.a.</strong> (ref. Caixa). Cooperativas (Viacredi/Ailos, Sicredi) também operam terreno.</p>' +
                     avisos +
-                    '<p style="margin-top:10px;"><strong>Dica do Cal:</strong> comprando <strong>terreno + construção</strong> em um contrato único, você volta a financiar até 80% do total, usar FGTS e pode até enquadrar no MCMV.</p>' +
-                    '</div>';
+                    '<p><strong>Dica do Cal:</strong> comprando <strong>terreno + construção</strong> num contrato único, você volta a financiar até 80% do total, usar FGTS e pode até enquadrar no MCMV.</p>';
+                return colapsavel('🏞️ Terreno — regras da modalidade' + (temAvisos ? ' <em>(avisos importantes)</em>' : ''), conteudo, temAvisos);
             }
 
             // Terreno + Construção (inclui construção em terreno próprio)
             if (tipo === 'construir') {
-                let nota = '<div class="mcmv-banner">' +
+                const conteudo =
                     '<span class="faixa-tag">Terreno + Construção</span>' +
-                    '<h4>Modalidade construção — mais vantajosa</h4>' +
                     '<p>Financia até <strong>80% do total</strong> (terreno + obra) · <strong>Pode usar FGTS</strong> · Prazo até <strong>35 anos</strong> · Pode enquadrar no <strong>MCMV</strong>.</p>' +
-                    '<p style="margin-top:10px;"><strong>Já tem o terreno?</strong> O valor dele conta como entrada — some ao campo "Entrada". Se o terreno vale 20% ou mais do total, dá para financiar 100% da obra.</p>' +
-                    '</div>';
+                    '<p><strong>Já tem o terreno?</strong> O valor dele conta como entrada — some ao campo "Entrada". Se o terreno vale 20% ou mais do total, dá para financiar 100% da obra.</p>';
+                let html = colapsavel('🏗️ Terreno + Construção — como funciona', conteudo, false);
                 const fx = avaliarMCMV(renda, valorImovel, tipo);
                 if (fx) {
-                    nota += '<div class="mcmv-banner ' + (fx.faixa === 4 ? 'destaque-f4' : '') + '">' +
+                    html += '<div class="mcmv-banner ' + (fx.faixa === 4 ? 'destaque-f4' : '') + '">' +
                         '<span class="faixa-tag">MCMV · Faixa ' + fx.faixa + '</span>' +
                         '<h4>E ainda pode entrar no Minha Casa Minha Vida</h4>' +
                         '<p><strong>Renda até R$ ' + formatMoney(fx.rendaMax) + '/mês</strong> · Teto R$ ' + formatMoney(fx.tetoImovel) + ' · ' + fx.subsidio + '</p>' +
                         '</div>';
                 }
-                return nota;
+                return html;
             }
 
             const faixa = avaliarMCMV(renda, valorImovel, tipo);
@@ -1217,8 +1249,7 @@
         }
 
         function disclaimerHTML() {
-            return '<div class="info-disclaimer">' +
-                '<h4>Leia antes de consultar os bancos</h4>' +
+            const conteudo =
                 '<p>Esta simulação utiliza os <strong>critérios máximos públicos</strong> de cada banco para ' +
                 (tipoImovel === 'terreno' ? '<strong>terreno (lote urbanizado)</strong>' : tipoImovel === 'construir' ? '<strong>terreno + construção</strong>' : 'imóvel <strong>' + (tipoImovel === 'novo' ? 'novo' : 'usado') + '</strong>') + '. Na prática, o percentual aprovado pode ser menor conforme:</p>' +
                 '<ul>' +
@@ -1227,8 +1258,8 @@
                 '<li><strong>Dívidas existentes</strong> e outros compromissos</li>' +
                 '<li><strong>Perfil de risco</strong> avaliado por cada instituição</li>' +
                 '</ul>' +
-                '<p><strong>Recomendação:</strong> use como referência inicial e confirme as condições reais diretamente com o Cal.</p>' +
-                '</div>';
+                '<p><strong>Recomendação:</strong> use como referência inicial e confirme as condições reais diretamente com o Cal.</p>';
+            return colapsavel('ℹ️ Leia antes de consultar os bancos', conteudo, false);
         }
 
         function calcularInteligente(valorImovel, entradaTotal, renda, prazo, sistema) {
@@ -1410,7 +1441,20 @@
                 const entradaTxt = 'R$ ' + formatMoney(entradaTotal) + ((s.fgts > 0 && tipoImovel !== 'terreno') ? ' (inclui FGTS R$ ' + formatMoney(s.fgts) + ')' : '');
                 const anosEsc = Number.isInteger(prazo / 12) ? ' (' + (prazo / 12) + ' anos)' : '';
 
-                html += '<table class="ficha">' +
+                // TELA: versão compacta (como antes)
+                html += '<div class="bank-details no-print">' +
+                    '<div class="detail-item"><div class="detail-label">Taxa Nominal</div><div class="detail-value">' + (taxaAplicada || banco.taxa).toFixed(2) + '% + ' + indexador + '</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">CET (estim.)</div><div class="detail-value">' + cetEstimado.toFixed(2) + '%</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">Cota máxima</div><div class="detail-value">' + ltv + '%</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">Financiado</div><div class="detail-value destaque">R$ ' + formatMoney(valorFinanciado) + '</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">1ª Parcela</div><div class="detail-value verde">R$ ' + formatMoney(parcelaInicial) + '</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">Última (menor)</div><div class="detail-value">R$ ' + formatMoney(parcelaFinal) + '</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">Prazo esc./máx.</div><div class="detail-value">' + prazo + '/' + prazoMaxExib + 'm</div></div>' +
+                    '<div class="detail-item"><div class="detail-label">Comprometimento</div><div class="detail-value">' + comprometimento.toFixed(1) + '%</div></div>' +
+                    '</div>';
+
+                // PDF: ficha detalhada completa (estilo comprovante)
+                html += '<table class="ficha print-only">' +
                     '<tr><td class="ficha-lbl">Modalidade</td><td class="ficha-val">' + nomeTipo(tipoImovel) + '</td></tr>' +
                     '<tr><td class="ficha-lbl">' + labelValorImovel + '</td><td class="ficha-val">R$ ' + formatMoney(valorImovel) + '</td></tr>' +
                     '<tr><td class="ficha-lbl">Valor da entrada</td><td class="ficha-val">' + entradaTxt + '</td></tr>' +
@@ -1641,6 +1685,13 @@
 
         function nomeTipo(t) {
             return t === 'novo' ? 'Novo' : t === 'usado' ? 'Usado' : t === 'construir' ? 'Terreno + Construção' : 'Terreno';
+        }
+
+        // Caixa que abre ao clicar (accordion). Só na tela — não vai pro PDF.
+        function colapsavel(titulo, conteudo, aberto) {
+            return '<details class="caixa-colapsavel no-print"' + (aberto ? ' open' : '') + '>' +
+                '<summary>' + titulo + '</summary>' +
+                '<div class="colapsavel-corpo">' + conteudo + '</div></details>';
         }
 
         // 1ª parcela de um financiamento (SAC ou PRICE)

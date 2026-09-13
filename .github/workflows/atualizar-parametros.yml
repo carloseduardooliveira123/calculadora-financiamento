@@ -32,23 +32,25 @@ jobs:
             --allowedTools Read,Edit,Bash,WebSearch,WebFetch
             --max-turns 40
           prompt: |
-            Voce mantem atualizados os parametros de financiamento imobiliario da calculadora do corretor Cal Oliveiras, publicada a partir deste repositorio (GitHub Pages e Netlify).
+            Voce mantem atualizados os parametros de financiamento imobiliario da calculadora do corretor Cal Oliveiras, publicada a partir deste repositorio (GitHub Pages e Netlify). Os valores aparecem para clientes reais.
 
             ARQUIVO ALVO: index.html (na raiz do repositorio, ja presente no diretorio de trabalho).
 
             Dentro do <script> do index.html, os parametros estao em:
             - const MCMV_FAIXAS = [...]  (faixas 1 a 4: rendaMax e tetoImovel)
             - const TETO_SFH = 2250000
-            - const BANCOS = {...}  (10 bancos; campos numericos: taxa, ltvNovo, ltvUsado, prazoMax, limiteMax)
-            E o carimbo de data: <span id="dataVerificacao">DD/MM/AAAA</span>
+            - const TERRENO = { ltv, prazoMax, limiteMax, valorMin, taxaNominal, cetEfetivo }  (lote urbanizado / terreno puro)
+            - const BANCOS = {...}  (10 bancos; campos numericos: taxa, ltvNovo, ltvUsado, prazoMax, limiteMax; alguns tem terreno: true e terrenoLtv)
+            E o carimbo de data no rodape: <span id="dataVerificacao">DD/MM/AAAA</span>
 
             TAREFA (faca hoje):
             1. Descubra a data de hoje rodando no Bash: date +%d/%m/%Y
-            2. Pesquise na web os valores VIGENTES HOJE, priorizando fontes oficiais/confiaveis (caixa.gov.br, sites dos bancos, gov.br/cidades, Banco Central/bcb.gov.br, e imprensa economica reconhecida):
+            2. Pesquise na web os valores VIGENTES HOJE, priorizando fontes oficiais/confiaveis (caixa.gov.br e simulador oficial da Caixa, sites dos bancos, gov.br/cidades e portarias do Ministerio das Cidades, Banco Central/bcb.gov.br e resolucoes do CMN, e imprensa economica reconhecida):
                - Taxa de juros (a.a.) de financiamento imobiliario de cada banco: Caixa, BB, Itau, Bradesco, Santander, BRB, Inter, Sicredi, Sicoob, Viacredi (Ailos).
                - Teto do SFH (hoje R$ 2.250.000) e % maximo financiado para imovel NOVO e USADO (entrada minima).
-               - Faixas do MCMV (1 a 4): renda maxima e teto do imovel, incluindo a Faixa 4 (classe media).
-            3. Compare com os valores atuais no index.html. Para cada divergencia confirmada por fonte confiavel, use a ferramenta Edit para alterar APENAS o numero correspondente (sem quebrar a sintaxe JS, sem mexer em textos/estrutura/estilo).
+               - Faixas do MCMV (1 a 4): renda maxima e teto do imovel. Referencia atual: Faixa 4 = renda ate R$ 13.000, imovel ate R$ 600.000, juros ate 9,9% a.a. (Portaria MCID 333/2026).
+               - TERRENO (lote urbanizado): cota maxima, prazo maximo e taxa da modalidade Caixa "SBPE - Aquisicao de Lote Urbanizado". Referencia confirmada no simulador OFICIAL da Caixa em jul/2026: cota 80%, prazo 240 meses, SAC/TR, juros nominais 12,73% a.a. (efetivos 13,50%), sem FGTS, fora do MCMV. Cotas por banco hoje: Caixa 80, Sicoob 80, Bradesco 70 (campo terrenoLtv).
+            3. Compare com os valores atuais no index.html. Para cada divergencia confirmada por fonte confiavel E MAIS RECENTE que a referencia citada, use a ferramenta Edit para alterar APENAS o numero correspondente (sem quebrar a sintaxe JS, sem mexer em textos/estrutura/estilo).
             4. SEMPRE atualize o <span id="dataVerificacao"> para a data de hoje (DD/MM/AAAA), mesmo que nada mais mude.
             5. Publique as mudancas rodando no Bash:
                git add index.html
@@ -56,9 +58,10 @@ jobs:
                git push origin HEAD:main
 
             REGRAS DE SEGURANCA (os valores aparecem para clientes reais):
-            - NUNCA invente numeros. So altere um parametro se houver fonte publica e confiavel confirmando o novo valor. Na duvida, mantenha o valor atual.
-            - Mantenha ltvNovo >= ltvUsado.
+            - NUNCA invente numeros. So altere um parametro se houver fonte publica, confiavel e datada confirmando o novo valor. Na duvida, mantenha o valor atual e relate a duvida.
+            - ARMADILHA CONHECIDA: a FAQ antiga da Caixa sobre lote urbanizado (70% SAC / 60% PRICE) esta DESATUALIZADA e saiu do ar; conteudo antigo em cache de buscador NAO e fonte valida. NAO regredir a cota de terreno para 70% com base nisso. So altere terreno com fonte claramente mais recente que jul/2026.
+            - Mantenha ltvNovo >= ltvUsado e terrenoLtv <= ltvUsado.
             - Nao altere estrutura, estilo, textos ou logica do arquivo, apenas os numeros dos parametros e a data.
             - Se nada (alem da data) mudar, ainda assim faca o commit/push so com a data atualizada.
 
-            Ao final, escreva um resumo: o que verificou, o que mudou (antigo -> novo + fonte) e confirme se o push foi concluido.
+            Ao final, escreva um resumo: o que verificou, o que mudou (antigo -> novo + fonte + data da fonte), o que ficou em duvida, e confirme se o push foi concluido.

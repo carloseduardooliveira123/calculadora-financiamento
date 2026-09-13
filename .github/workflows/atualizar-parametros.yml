@@ -47,6 +47,8 @@ jobs:
             - const BANCOS = {...}  (10 bancos; campos numericos: taxa, ltvNovo, ltvUsado, prazoMax, limiteMax; alguns tem terreno: true e terrenoLtv)
             E o carimbo de data no rodape: <span id="dataVerificacao">DD/MM/AAAA</span>
 
+            ECONOMIA DE TOKENS: o index.html e grande — NAO leia o arquivo inteiro. Localize as linhas dos parametros com Bash (ex.: grep -n "rendaMax\|const TETO_SFH\|const TERRENO\|taxa:\|terrenoLtv\|dataVerificacao" index.html) e leia apenas esses trechos.
+
             SEJA EFICIENTE (ha limite de turnos): agrupe as buscas (ex.: uma busca por "taxas financiamento imobiliario bancos 2026" cobre varios bancos de uma vez; faca no maximo ~15 buscas no total), evite releituras desnecessarias, e assim que terminar as edicoes FACA O COMMIT E O PUSH IMEDIATAMENTE (passo 5) antes de qualquer resumo. O resumo final deve ser curto (ate 10 linhas).
 
             TAREFA (faca hoje):
@@ -71,3 +73,41 @@ jobs:
             - Se nada (alem da data) mudar, ainda assim faca o commit/push so com a data atualizada.
 
             Ao final, escreva um resumo: o que verificou, o que mudou (antigo -> novo + fonte + data da fonte), o que ficou em duvida, e confirme se o push foi concluido.
+
+      # Aviso automatico: se o robo mudou algum PARAMETRO (nao so a data),
+      # abre uma Issue no repositorio -> o GitHub envia e-mail ao dono.
+      # Custo zero (nao usa API da Anthropic nem servico externo).
+      - name: Avisar se algum parametro mudou (Issue -> e-mail do GitHub)
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          git fetch origin main
+          HEAD=$(git rev-parse origin/main)
+          if [ "$BASE" = "$HEAD" ]; then
+            echo "Robo nao publicou nada nesta rodada."
+            exit 0
+          fi
+          DIFF=$(git diff "$BASE" "$HEAD" -- index.html | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' | grep -v 'dataVerificacao' || true)
+          if [ -z "$DIFF" ]; then
+            echo "So a data de verificacao mudou — sem aviso."
+            exit 0
+          fi
+          {
+            echo "O robo diario alterou parametros da calculadora (https://simule-aqui.netlify.app)."
+            echo
+            echo "Linhas removidas (-) e adicionadas (+) no index.html:"
+            echo
+            echo '```diff'
+            echo "$DIFF"
+            echo '```'
+            echo
+            echo "Commit: https://github.com/$REPO/commit/$HEAD"
+            echo
+            echo "Se algum valor estiver errado, corrija no index.html (ou peca ao Claude) — o site republica sozinho."
+          } > /tmp/aviso.md
+          gh issue create \
+            --title "📊 Parametros alterados pelo robo — $(date +%d/%m/%Y)" \
+            --body-file /tmp/aviso.md

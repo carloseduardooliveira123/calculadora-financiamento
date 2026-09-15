@@ -1,10 +1,10 @@
 name: Atualizar parametros dos bancos
 
-# Roda todo dia de manha (08:00 BRT = 11:00 UTC) e tambem pode ser
+# Roda toda SEGUNDA de manha (08:00 BRT = 11:00 UTC) e tambem pode ser
 # disparado manualmente pelo botao "Run workflow" na aba Actions.
 on:
   schedule:
-    - cron: "0 11 * * *"
+    - cron: "0 11 * * 1"
   workflow_dispatch: {}
 
 permissions:
@@ -34,7 +34,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: |
             --allowedTools Read,Edit,Bash,WebSearch,WebFetch
-            --max-turns 120
+            --model claude-sonnet-5
+            --max-turns 40
           prompt: |
             Voce mantem atualizados os parametros de financiamento imobiliario da calculadora do corretor Cal Oliveiras, publicada a partir deste repositorio (GitHub Pages e Netlify). Os valores aparecem para clientes reais.
 
@@ -49,7 +50,7 @@ jobs:
 
             ECONOMIA DE TOKENS: o index.html e grande — NAO leia o arquivo inteiro. Localize as linhas dos parametros com Bash (ex.: grep -n "rendaMax\|const TETO_SFH\|const TERRENO\|taxa:\|terrenoLtv\|dataVerificacao" index.html) e leia apenas esses trechos.
 
-            SEJA EFICIENTE (ha limite de turnos): agrupe as buscas (ex.: uma busca por "taxas financiamento imobiliario bancos 2026" cobre varios bancos de uma vez; faca no maximo ~15 buscas no total), evite releituras desnecessarias, e assim que terminar as edicoes FACA O COMMIT E O PUSH IMEDIATAMENTE (passo 5) antes de qualquer resumo. O resumo final deve ser curto (ate 10 linhas).
+            SEJA EFICIENTE (ha limite de turnos): agrupe as buscas (ex.: uma busca por "taxas financiamento imobiliario bancos 2026" cobre varios bancos de uma vez; faca NO MAXIMO 6 buscas no total (2-3 paginas comparativas ja cobrem os 10 bancos)), evite releituras desnecessarias, e assim que terminar as edicoes FACA O COMMIT E O PUSH IMEDIATAMENTE (passo 5) antes de qualquer resumo. O resumo final deve ser curto (ate 10 linhas).
 
             TAREFA (faca hoje):
             1. Descubra a data de hoje rodando no Bash: date +%d/%m/%Y
@@ -96,7 +97,7 @@ jobs:
             exit 0
           fi
           {
-            echo "O robo diario alterou parametros da calculadora (https://simule-aqui.netlify.app)."
+            echo "O robo semanal alterou parametros da calculadora (https://simule-aqui.netlify.app)."
             echo
             echo "Linhas removidas (-) e adicionadas (+) no index.html:"
             echo

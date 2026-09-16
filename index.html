@@ -690,8 +690,77 @@
             a { color: #000; text-decoration: none; }
         }
 
+
+        /* ---------- OBJETIVO: simulação completa × imóvel em vista ---------- */
+        .objetivo-toggle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .objetivo-option {
+            padding: 14px 12px;
+            border: 1.5px solid var(--cinza-claro);
+            border-radius: 12px;
+            background: var(--branco);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.25s ease;
+        }
+        .objetivo-option:hover { border-color: var(--cinza); transform: translateY(-2px); }
+        .objetivo-option.active { border-color: var(--terra-medio); background: var(--terra-medio); color: var(--branco); }
+        .objetivo-option h3 { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 600; margin-bottom: 3px; }
+        .objetivo-option p { font-size: 12px; opacity: 0.85; }
+
+        .tipo-toggle.vi-tipo-toggle { grid-template-columns: repeat(4, 1fr); }
+
+        /* ---------- resultado "imóvel em vista" ---------- */
+        .vi-card {
+            background: var(--branco);
+            border: 2px solid var(--terra-medio);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 18px;
+        }
+        .vi-kicker { font-size: 12px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--cinza); margin-bottom: 8px; }
+        .vi-titulo { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 600; color: var(--terra-escuro); margin-bottom: 18px; line-height: 1.3; }
+        .vi-titulo strong { color: var(--terra-medio); }
+        .vi-grid .detail-value { font-size: 19px; }
+        .detail-sub { font-size: 11px; color: var(--cinza); margin-top: 4px; line-height: 1.35; }
+        .vi-notas p { font-size: 13.5px; line-height: 1.55; color: var(--terra-escuro); margin: 8px 0 0; }
+        .vi-notas .vi-mini { font-size: 11.5px; color: var(--cinza); font-style: italic; }
+
+        .vi-ajuste {
+            background: #f7f6f1;
+            border: 1px solid var(--cinza-claro);
+            border-radius: 14px;
+            padding: 22px 24px;
+            margin-bottom: 18px;
+        }
+        .vi-ajuste h4 { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 600; color: var(--terra-medio); margin-bottom: 4px; }
+        .vi-ajuste > p { font-size: 13px; color: var(--cinza); margin-bottom: 14px; }
+        .vi-diag { margin-top: 16px; border-radius: 10px; padding: 16px 18px; background: var(--branco); border-left: 4px solid var(--terra-medio); }
+        .vi-diag.ok { border-left-color: var(--aprovado-vivo); }
+        .vi-diag.gap { border-left-color: var(--terra-medio); }
+        .vi-diag-titulo { font-weight: 600; font-size: 15px; color: var(--terra-escuro); margin-bottom: 8px; }
+        .vi-diag ul { list-style: none; }
+        .vi-diag > ul > li { font-size: 13.5px; line-height: 1.55; padding: 5px 0 5px 22px; position: relative; color: var(--terra-escuro); }
+        .vi-diag > ul > li.ok:before { content: "✓"; position: absolute; left: 0; color: var(--aprovado-vivo); font-weight: 700; }
+        .vi-diag > ul > li.gap:before { content: "→"; position: absolute; left: 0; color: var(--terra-medio); font-weight: 700; }
+        .vi-diag li ul { margin: 6px 0 0 4px; }
+        .vi-diag li ul li { font-size: 13px; padding: 3px 0 3px 14px; position: relative; }
+        .vi-diag li ul li:before { content: "•"; position: absolute; left: 0; color: var(--cinza); }
+
+        .vi-ctas { display: grid; gap: 10px; margin-bottom: 18px; }
+        .vi-ctas .btn { margin-top: 0; text-decoration: none; display: block; text-align: center; }
+        .vi-btn-sec { background: var(--branco) !important; color: var(--terra-medio) !important; border: 1.5px solid var(--terra-medio) !important; }
+        .vi-btn-sec:hover { background: #f7f6f1 !important; }
+        @media (min-width: 769px) { .vi-ctas { grid-template-columns: 1fr 1fr; } .vi-ctas .btn:first-child:nth-last-child(3) { grid-column: 1 / -1; } }
+
         @media (max-width: 768px) {
             .mode-selector { grid-template-columns: 1fr 1fr; }
+            .objetivo-option h3 { font-size: 15px; }
+            .vi-titulo { font-size: 19px; }
             .bank-details { grid-template-columns: 1fr 1fr; }
             .logo-name { font-size: 36px; }
         }
@@ -707,6 +776,40 @@
         </div>
 
         <div class="content">
+            <div class="objetivo-toggle no-print" id="objetivoToggle">
+                <div class="objetivo-option active" data-objetivo="completo">
+                    <h3>📊 Simulação completa</h3>
+                    <p>Com meus dados, o financiamento aprova?</p>
+                </div>
+                <div class="objetivo-option" data-objetivo="imovel">
+                    <h3>🏠 Tenho um imóvel em vista</h3>
+                    <p>O que preciso para comprá-lo?</p>
+                </div>
+            </div>
+
+            <div id="modoImovel" style="display:none;">
+                <div class="form-section">
+                    <h3>Qual imóvel você tem em vista?</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <div class="tipo-toggle vi-tipo-toggle" id="viTipoToggle">
+                                <div class="tipo-option vi-tipo-option active" data-vitipo="novo">Novo</div>
+                                <div class="tipo-option vi-tipo-option" data-vitipo="usado">Usado</div>
+                                <div class="tipo-option vi-tipo-option" data-vitipo="terreno">Terreno</div>
+                                <div class="tipo-option vi-tipo-option" data-vitipo="construir">Construir</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label id="viLabelValor">Valor do Imóvel</label>
+                            <input type="text" id="viValor" inputmode="numeric" placeholder="R$ 500.000">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="simularImovelEmVista()">Ver o que preciso para comprar</button>
+                </div>
+            </div>
+
+            <div id="modoCompleto">
             <div class="mode-selector">
                 <div class="tipo-box">
                     <div class="tipo-box-title">Tipo do Imóvel</div>
@@ -785,6 +888,7 @@
 
                 <button class="btn" onclick="calcular()">Simular Financiamento</button>
             </div>
+            </div><!-- /modoCompleto -->
 
             <div id="results" class="results"></div>
         </div>
@@ -801,8 +905,8 @@
     <div class="modal-overlay" id="leadModal">
         <div class="modal-box">
             <span class="modal-tag">Falta só um passo</span>
-            <h3>Sua simulação está pronta!</h3>
-            <p>Informe seu <strong>nome</strong> e <strong>WhatsApp</strong> para liberar o resultado. O Cal usa esses dados para te ajudar a conseguir as melhores condições de financiamento.</p>
+            <h3 id="leadModalTitulo">Sua simulação está pronta!</h3>
+            <p id="leadModalTexto">Informe seu <strong>nome</strong> e <strong>WhatsApp</strong> para liberar o resultado. O Cal usa esses dados para te ajudar a conseguir as melhores condições de financiamento.</p>
             <div class="form-group">
                 <label>Seu Nome</label>
                 <input type="text" id="nome" placeholder="Como você se chama?">
@@ -812,9 +916,9 @@
                 <input type="text" id="telefone" inputmode="numeric" placeholder="(47) 99999-9999">
             </div>
             <div class="modal-error" id="leadError"></div>
-            <button class="btn" style="margin-top:18px;" onclick="liberarSimulacao()">Ver minha simulação</button>
+            <button class="btn" style="margin-top:18px;" onclick="liberarSimulacao()" id="leadModalBtn">Ver minha simulação</button>
             <button class="modal-cancel" onclick="fecharLeadModal()">Voltar e revisar os dados</button>
-            <p class="modal-privacy">Seus dados não são armazenados em servidor — são usados apenas para falar com o Cal pelo WhatsApp.</p>
+            <p class="modal-privacy">Seus dados são usados apenas pelo Cal para te atender (WhatsApp e sistema de atendimento dele). Não são vendidos nem repassados a terceiros.</p>
         </div>
     </div>
 
@@ -972,9 +1076,9 @@
         document.getElementById('telefone').addEventListener('input', function () { aplicarMascaraTelefone(this); });
 
         /* ============ TOGGLE NOVO / USADO ============ */
-        document.querySelectorAll('.tipo-option').forEach(opt => {
+        document.querySelectorAll('#tipoToggle .tipo-option').forEach(opt => {
             opt.addEventListener('click', function () {
-                document.querySelectorAll('.tipo-option').forEach(o => o.classList.remove('active'));
+                document.querySelectorAll('#tipoToggle .tipo-option').forEach(o => o.classList.remove('active'));
                 this.classList.add('active');
                 tipoImovel = this.dataset.tipo;
                 const lbl = document.getElementById('labelValor');
@@ -1104,7 +1208,14 @@
             executarSimulacao();
         }
 
-        function abrirLeadModal() {
+        function abrirLeadModal(ctx) {
+            contextoLead = ctx || 'simulacao';
+            const plano = contextoLead === 'plano';
+            document.getElementById('leadModalTitulo').textContent = plano ? 'Vamos traçar o seu plano' : 'Sua simulação está pronta!';
+            document.getElementById('leadModalTexto').innerHTML = plano
+                ? 'Deixe seu <strong>nome</strong> e <strong>WhatsApp</strong>. O Cal recebe a sua simulação e te chama para montar o caminho até este imóvel — sem compromisso.'
+                : 'Informe seu <strong>nome</strong> e <strong>WhatsApp</strong> para liberar o resultado. O Cal usa esses dados para te ajudar a conseguir as melhores condições de financiamento.';
+            document.getElementById('leadModalBtn').textContent = plano ? 'Quero meu plano' : 'Ver minha simulação';
             document.getElementById('leadError').textContent = '';
             document.getElementById('leadModal').classList.add('active');
             document.getElementById('nome').focus();
@@ -1134,6 +1245,7 @@
             erro.textContent = '';
             leadCapturado = true;
             fecharLeadModal();
+            if (contextoLead === 'plano') { concluirPlanoDoCal(); return; }
             executarSimulacao();
             enviarLeadParaCRM();
             document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
@@ -1176,7 +1288,9 @@
                 'Imovel: ' + nomeTipo(s.tipo) + ' · R$ ' + formatMoney(s.valorImovel) + '\n' +
                 'Entrada: R$ ' + formatMoney(s.entrada) + ' | FGTS: R$ ' + formatMoney(s.fgts) + '\n' +
                 'Renda: R$ ' + formatMoney(s.renda) + ' | Prazo: ' + anos + ' | Sistema: ' + s.sistema + '\n\n' +
-                diagnostico;
+                diagnostico +
+                (linhaImovelRef() ? '\n' + linhaImovelRef() : '') +
+                (linhaCampanha() ? '\n' + linhaCampanha() : '');
 
             const payload = {
                 nome: nome,
@@ -1717,6 +1831,385 @@
             if (!value && value !== 0) return '0,00';
             return parseFloat(value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
+
+        /* =====================================================================
+           MODO "IMÓVEL EM VISTA" — cálculo reverso
+           O cliente informa só o imóvel; a calculadora responde o que ele
+           precisa ter (entrada, renda, custos de escritura) para comprá-lo.
+           Reaproveita BANCOS / TERRENO / MCMV_FAIXAS e os helpers de parcela.
+           ===================================================================== */
+        // Custos para escriturar (estimativa, % sobre o valor do imóvel):
+        // ITBI de Brusque/SC 2% + registro/escritura ~1%. Ajustável.
+        const CUSTOS_AQUISICAO = { itbi: 2.0, registro: 1.0 };
+        const MCMV_TAXA_F4 = 9.9;   // juros máx. Faixa 4 (Portaria MCID 333/2026)
+        const COMPROMETIMENTO_MAX = 0.30;
+
+        let objetivoAtual = 'completo';   // 'completo' (simulação atual) | 'imovel'
+        let viTipo = 'novo';
+        let contextoLead = 'simulacao';   // 'simulacao' | 'plano'
+        let imovelRef = { id: '', link: '' };
+        let ultimoImovelEmVista = null;
+
+        function esc(s) {
+            return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        /* ---------- origem / UTM (preservada na sessão até a conversão) ---------- */
+        const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+        function capturarOrigem() {
+            const p = new URLSearchParams(location.search);
+            const utm = {};
+            UTM_KEYS.forEach(k => { const v = p.get(k); if (v) utm[k] = v.slice(0, 80); });
+            try {
+                if (Object.keys(utm).length) sessionStorage.setItem('sa_utm', JSON.stringify(utm));
+                else { const s = sessionStorage.getItem('sa_utm'); if (s) Object.assign(utm, JSON.parse(s)); }
+            } catch (e) { /* armazenamento indisponível: segue sem UTM */ }
+            return utm;
+        }
+        const origemUTM = capturarOrigem();
+        function linhaCampanha() {
+            const u = origemUTM;
+            const partes = UTM_KEYS.map(k => u[k]).filter(Boolean);
+            return partes.length ? 'Campanha: ' + partes.join(' / ') : '';
+        }
+        function linhaImovelRef() {
+            const l = [];
+            if (imovelRef.id) l.push('Ref. imovel: ' + imovelRef.id);
+            if (imovelRef.link) l.push('Anuncio: ' + imovelRef.link);
+            return l.join('\n');
+        }
+
+        // Eventos de conversão: hoje só preparam o terreno (dataLayer / gtag / fbq
+        // se existirem). Nada é enviado enquanto não houver Pixel/Analytics instalado.
+        function registrarEvento(nome, dados) {
+            try {
+                (window.dataLayer = window.dataLayer || []).push(Object.assign({ event: nome }, dados || {}));
+                if (typeof gtag === 'function') gtag('event', nome, dados || {});
+                if (typeof fbq === 'function') fbq('trackCustom', nome, dados || {});
+            } catch (e) { /* silencioso */ }
+        }
+
+        /* ---------- seletor de objetivo ---------- */
+        function selecionarObjetivo(obj) {
+            objetivoAtual = obj;
+            document.querySelectorAll('.objetivo-option').forEach(o => o.classList.toggle('active', o.dataset.objetivo === obj));
+            document.getElementById('modoCompleto').style.display = (obj === 'completo') ? '' : 'none';
+            document.getElementById('modoImovel').style.display = (obj === 'imovel') ? '' : 'none';
+            document.getElementById('results').innerHTML = '';
+        }
+        document.querySelectorAll('.objetivo-option').forEach(o => {
+            o.addEventListener('click', function () { selecionarObjetivo(this.dataset.objetivo); });
+        });
+
+        document.querySelectorAll('.vi-tipo-option').forEach(opt => {
+            opt.addEventListener('click', function () { setViTipo(this.dataset.vitipo); });
+        });
+        function setViTipo(t) {
+            viTipo = t;
+            document.querySelectorAll('.vi-tipo-option').forEach(o => o.classList.toggle('active', o.dataset.vitipo === t));
+            const lbl = document.getElementById('viLabelValor');
+            if (lbl) lbl.textContent = t === 'terreno' ? 'Valor do Terreno' : t === 'construir' ? 'Valor total (terreno + obra)' : 'Valor do Imóvel';
+        }
+        document.getElementById('viValor').addEventListener('input', function () { aplicarMascaraDinheiro(this); });
+        document.getElementById('viValor').addEventListener('keydown', function (e) { if (e.key === 'Enter') simularImovelEmVista(); });
+
+        /* ---------- motor do cálculo reverso ---------- */
+        // Cenários por banco válidos para este tipo/valor (cota, prazo máx. e taxa efetivos)
+        function cenariosParaImovel(tipo, valor) {
+            return Object.keys(BANCOS).map(c => {
+                const b = BANCOS[c];
+                let ltv, prazoMax, limite, taxa;
+                if (tipo === 'terreno') {
+                    if (!b.terreno) return null;
+                    ltv = b.terrenoLtv || TERRENO.ltv; prazoMax = TERRENO.prazoMax; limite = TERRENO.limiteMax; taxa = TERRENO.taxaNominal;
+                } else if (tipo === 'construir') {
+                    ltv = 80; prazoMax = b.prazoMax; limite = b.limiteMax; taxa = b.taxa;
+                } else {
+                    ltv = (tipo === 'novo') ? b.ltvNovo : b.ltvUsado; prazoMax = b.prazoMax; limite = b.limiteMax; taxa = b.taxa;
+                }
+                if (valor > limite) return null;
+                return { codigo: c, banco: b, ltv, prazoMax, taxa };
+            }).filter(Boolean);
+        }
+
+        function calcularImovelEmVista(valor, tipo) {
+            const cen = cenariosParaImovel(tipo, valor);
+            if (!cen.length) return null;
+            const ehTerreno = tipo === 'terreno';
+
+            const ltvMax = Math.max.apply(null, cen.map(x => x.ltv));
+            const entradaMin = Math.round(valor * (1 - ltvMax / 100));
+            const vf = valor - entradaMin;
+            const taxaRef = Math.min.apply(null, cen.map(x => x.taxa));           // melhor taxa entre os bancos que operam este valor
+            const prazoLongo = Math.max.apply(null, cen.map(x => x.prazoMax));   // 420 (35 anos) ou 240 no terreno
+            const prazoSac = Math.min(360, prazoLongo);
+            const tm = taxaRef / 100 / 12;
+
+            // terreno: só SAC (padrão Caixa lote urbanizado). Demais: PRICE longo = cenário mais leve; SAC 30 anos = cenário conservador
+            const parcelaLeve = ehTerreno ? parcelaInicialDe(vf, prazoLongo, tm, 'SAC') : parcelaInicialDe(vf, prazoLongo, tm, 'PRICE');
+            const parcelaSac = parcelaInicialDe(vf, prazoSac, tm, 'SAC');
+            const rendaLeve = parcelaLeve / COMPROMETIMENTO_MAX;
+            const rendaSac = parcelaSac / COMPROMETIMENTO_MAX;
+
+            const itbi = valor * CUSTOS_AQUISICAO.itbi / 100;
+            const registro = valor * CUSTOS_AQUISICAO.registro / 100;
+            const totalSaida = entradaMin + itbi + registro;
+
+            const fgtsOk = !ehTerreno && valor <= TETO_SFH;
+
+            // MCMV: dentro do teto? e a renda necessária com juros de 9,9% cabe na Faixa 4?
+            let mcmv = null;
+            if (!ehTerreno && tipo !== 'construir') {
+                const f4 = MCMV_FAIXAS[MCMV_FAIXAS.length - 1];
+                if (valor <= f4.tetoImovel) {
+                    const entradaF4 = Math.round(valor * 0.20);
+                    const vfF4 = valor - entradaF4;
+                    const parcelaF4 = parcelaInicialDe(vfF4, 420, MCMV_TAXA_F4 / 100 / 12, 'PRICE');
+                    const rendaF4 = parcelaF4 / COMPROMETIMENTO_MAX;
+                    mcmv = { faixa: f4, entrada: entradaF4, parcela: parcelaF4, renda: rendaF4, cabe: rendaF4 <= f4.rendaMax };
+                }
+            }
+
+            return { valor, tipo, ltvMax, entradaMin, vf, taxaRef, prazoLongo, prazoSac, parcelaLeve, parcelaSac, rendaLeve, rendaSac, itbi, registro, totalSaida, fgtsOk, mcmv, ehTerreno, bancos: cen.length };
+        }
+
+        function simularImovelEmVista() {
+            const valor = removerMascara(document.getElementById('viValor').value);
+            if (valor <= 0) { alert('Informe o valor do imóvel que você tem em vista.'); return; }
+            const r = calcularImovelEmVista(valor, viTipo);
+            if (!r) {
+                document.getElementById('results').innerHTML =
+                    '<div class="mcmv-banner indisponivel"><h4>Valor acima do que os bancos parametrizados operam</h4>' +
+                    '<p>Para ' + nomeTipo(viTipo).toLowerCase() + ' de R$ ' + formatMoney(valor) + ' a condição é caso a caso. Fale direto com o Cal pelo WhatsApp.</p></div>';
+                return;
+            }
+            r.situacao = null;
+            ultimoImovelEmVista = r;
+            registrarEvento('simulation_completed', { modo: 'imovel_em_vista', valor: valor, tipo: viTipo });
+            document.getElementById('results').innerHTML = renderImovelEmVista(r);
+            ['viEntrada', 'viFgts', 'viRenda'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', function () { aplicarMascaraDinheiro(this); avaliarSituacao(); });
+            });
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function anosTxt(m) { return Number.isInteger(m / 12) ? (m / 12) + ' anos' : m + ' meses'; }
+
+        function renderImovelEmVista(r) {
+            const hoje = new Date().toLocaleDateString('pt-BR');
+            const tipoTxt = nomeTipo(r.tipo);
+            const refTxt = imovelRef.id ? ' · ref. ' + esc(imovelRef.id) : '';
+
+            let html = '<div class="acoes-topo no-print"><button class="btn-imprimir" onclick="window.print()">🖨️ Baixar / Imprimir em PDF</button></div>';
+
+            html += '<div class="vi-card">' +
+                '<div class="vi-kicker">Imóvel em vista · ' + tipoTxt + refTxt + ' · ' + hoje + '</div>' +
+                '<h3 class="vi-titulo">Para comprar este ' + (r.ehTerreno ? 'terreno' : 'imóvel') + ' de <strong>R$ ' + formatMoney(r.valor) + '</strong>, você precisa de:</h3>' +
+                '<div class="bank-details vi-grid">' +
+                item('Entrada mínima', 'R$ ' + formatMoney(r.entradaMin), (100 - r.ltvMax) + '% do valor' + (r.fgtsOk ? ' · FGTS pode abater' : r.ehTerreno ? ' · sem FGTS' : ''), 'destaque') +
+                item('Financiamento (até)', 'R$ ' + formatMoney(r.vf), 'cota máx. ' + r.ltvMax + '% · ' + r.bancos + ' banco' + (r.bancos > 1 ? 's' : '') + ' operam') +
+                item('Renda familiar necessária', 'a partir de R$ ' + formatMoney(r.rendaLeve), (r.ehTerreno ? 'SAC ' : 'PRICE ') + anosTxt(r.prazoLongo) + ' · parcela ~R$ ' + formatMoney(r.parcelaLeve), 'destaque') +
+                (r.ehTerreno ? '' : item('Renda com SAC em ' + anosTxt(r.prazoSac), 'R$ ' + formatMoney(r.rendaSac), '1ª parcela ~R$ ' + formatMoney(r.parcelaSac) + ' (depois cai)')) +
+                item('Custos de escritura', '~R$ ' + formatMoney(r.itbi + r.registro), 'ITBI ' + CUSTOS_AQUISICAO.itbi + '% + registro ~' + CUSTOS_AQUISICAO.registro + '% · pagos à vista') +
+                item('Total para "sair do zero"', 'R$ ' + formatMoney(r.totalSaida), 'entrada + custos de escritura', 'verde') +
+                '</div>';
+
+            // notas contextuais
+            let notas = '';
+            if (r.mcmv) {
+                if (r.mcmv.cabe) {
+                    notas += '<p>🏷️ <strong>Cabe no Minha Casa Minha Vida (Faixa ' + r.mcmv.faixa.faixa + ')</strong> se a renda familiar for até R$ ' + formatMoney(r.mcmv.faixa.rendaMax) +
+                        ': com juros de até ' + MCMV_TAXA_F4.toFixed(1).replace('.', ',') + '% a.a. e entrada de 20% (R$ ' + formatMoney(r.mcmv.entrada) + '), a renda necessária cai para <strong>~R$ ' + formatMoney(r.mcmv.renda) + '</strong>.</p>';
+                } else {
+                    notas += '<p>🏷️ Está dentro do teto do MCMV (R$ ' + formatMoney(r.mcmv.faixa.tetoImovel) + '), mas a parcela pede renda acima de R$ ' + formatMoney(r.mcmv.faixa.rendaMax) + ' — para usar o programa seria preciso <strong>entrada maior</strong>.</p>';
+                }
+            }
+            if (r.ehTerreno) notas += '<p>🌱 Terreno (lote urbanizado): financia até ' + r.ltvMax + '%, prazo máximo ' + anosTxt(TERRENO.prazoMax) + ', sistema SAC, <strong>sem uso de FGTS</strong> e fora do MCMV.</p>';
+            if (r.tipo === 'construir') notas += '<p>🏗️ Terreno + construção: se você já tem o terreno, o valor dele conta como entrada.</p>';
+            notas += '<p class="vi-mini">Cálculo pela regra de 30% de comprometimento da renda, com a melhor taxa entre os bancos parametrizados (' + r.taxaRef.toFixed(2).replace('.', ',') + '% a.a.). Seguros e tarifas do banco não estão incluídos — a parcela real costuma ficar um pouco acima.</p>';
+            html += '<div class="vi-notas">' + notas + '</div></div>';
+
+            // "e agora?"
+            html += '<div class="vi-ajuste"><h4>Tenho menos renda ou menos entrada — e agora?</h4>' +
+                '<p class="no-print">Preencha o que você tem hoje. A resposta atualiza na hora.</p>' +
+                '<div class="form-grid no-print">' +
+                '<div class="form-group"><label>Entrada que tenho</label><input type="text" id="viEntrada" inputmode="numeric" placeholder="R$ 0"></div>' +
+                (r.fgtsOk ? '<div class="form-group"><label>FGTS disponível</label><input type="text" id="viFgts" inputmode="numeric" placeholder="R$ 0"></div>' : '') +
+                '<div class="form-group"><label>Renda familiar bruta</label><input type="text" id="viRenda" inputmode="numeric" placeholder="R$ 0"></div>' +
+                '</div><div id="viDiagnostico"></div></div>';
+
+            // CTAs
+            html += '<div class="vi-ctas no-print">';
+            if (imovelRef.link) html += '<a class="btn vi-btn-sec" href="' + esc(imovelRef.link) + '" target="_blank" rel="noopener" onclick="registrarEvento(\'property_clicked\')">🏠 Conhecer este imóvel</a>';
+            html += '<button class="btn" onclick="pedirPlanoDoCal()">💬 Quero um plano do Cal para chegar lá</button>' +
+                '<button class="btn vi-btn-sec" onclick="irParaSimulacaoCompleta()">📊 Fazer a simulação completa com meus dados</button>' +
+                '</div>';
+
+            html += colapsavel('ℹ️ Como este cálculo foi feito',
+                '<p>Os valores são <strong>estimativas de referência</strong> calculadas com critérios públicos: cota máxima de financiamento de cada banco, melhor taxa parametrizada e a regra de que a parcela não pode passar de 30% da renda familiar bruta. Não incluem seguros (MIP/DFI) nem tarifas, que o banco soma à parcela.</p>' +
+                '<p>Os custos de escritura (ITBI e registro) variam por município e podem ter descontos em programas habitacionais. A aprovação, a taxa e as condições finais dependem da análise de crédito de cada instituição.</p>' +
+                '<p><strong>Não é proposta nem pré-aprovação.</strong> Use como ponto de partida e confirme com o Cal.</p>', false);
+
+            html += '<div class="print-rodape print-only"><strong>Carlos Oliveiras</strong> · Corretor Particular · CRECI 39020F · Brusque/SC · WhatsApp (47) 99900-1754<br>Este documento é uma simulação de referência, calculada com critérios públicos e parâmetros médios de mercado. Os valores definitivos — taxas, prazos, cota e a documentação exigida — só podem ser confirmados diretamente com a instituição financeira escolhida, após análise de crédito e avaliação do imóvel. Faça contato direto para uma condução pontual da sua situação.</div>';
+            return html;
+
+            function item(label, valor, sub, classe) {
+                return '<div class="detail-item"><div class="detail-label">' + label + '</div>' +
+                    '<div class="detail-value' + (classe ? ' ' + classe : '') + '">' + valor + '</div>' +
+                    (sub ? '<div class="detail-sub">' + sub + '</div>' : '') + '</div>';
+            }
+        }
+
+        // Diagnóstico ao vivo do bloco "e agora?"
+        function avaliarSituacao() {
+            const r = ultimoImovelEmVista;
+            const box = document.getElementById('viDiagnostico');
+            if (!r || !box) return;
+            const entrada = removerMascara((document.getElementById('viEntrada') || {}).value);
+            const fgts = r.fgtsOk ? removerMascara((document.getElementById('viFgts') || {}).value) : 0;
+            const renda = removerMascara((document.getElementById('viRenda') || {}).value);
+            if (entrada <= 0 && fgts <= 0 && renda <= 0) { box.innerHTML = ''; r.situacao = null; return; }
+
+            const tm = r.taxaRef / 100 / 12;
+            const sistema = r.ehTerreno ? 'SAC' : 'PRICE';
+            const entradaDisp = entrada + fgts;
+            const linhas = [];
+            let tudoOk = true;
+
+            // 1) entrada
+            let vfReal = r.vf;
+            if (entradaDisp > 0 || renda > 0) {
+                if (entradaDisp < r.entradaMin) {
+                    tudoOk = false;
+                    linhas.push({ ok: false, t: 'Entrada: faltam <strong>R$ ' + formatMoney(r.entradaMin - entradaDisp) + '</strong> para o mínimo de R$ ' + formatMoney(r.entradaMin) + (fgts > 0 ? ' (já contando o FGTS)' : '') + '.' });
+                } else {
+                    vfReal = r.valor - entradaDisp;
+                    linhas.push({ ok: true, t: 'Entrada: <strong>ok</strong>' + (entradaDisp > r.entradaMin ? ' — com R$ ' + formatMoney(entradaDisp) + ' você financia só R$ ' + formatMoney(vfReal) + ' e a parcela cai.' : '.') });
+                }
+            }
+
+            // 2) renda (sobre o que de fato seria financiado)
+            if (renda > 0) {
+                const parcela = parcelaInicialDe(vfReal, r.prazoLongo, tm, sistema);
+                const comp = parcela / renda;
+                if (comp <= COMPROMETIMENTO_MAX) {
+                    linhas.push({ ok: true, t: 'Renda: <strong>comporta</strong> — parcela ~R$ ' + formatMoney(parcela) + ' = ' + (comp * 100).toFixed(1).replace('.', ',') + '% da renda (limite 30%).' });
+                } else {
+                    tudoOk = false;
+                    const rendaNec = parcela / COMPROMETIMENTO_MAX;
+                    const maxVf = maxFinanciadoPara(renda * COMPROMETIMENTO_MAX, r.prazoLongo, tm, sistema);
+                    const entradaParaCaber = Math.max(r.entradaMin, r.valor - maxVf);
+                    linhas.push({ ok: false, t: 'Renda: parcela ~R$ ' + formatMoney(parcela) + ' = ' + (comp * 100).toFixed(1).replace('.', ',') + '% da renda (limite 30%). Dois caminhos:' +
+                        '<ul><li><strong>Compor renda</strong> (cônjuge/familiar): faltam ~R$ ' + formatMoney(rendaNec - renda) + '/mês para chegar a R$ ' + formatMoney(rendaNec) + '.</li>' +
+                        '<li><strong>Aumentar a entrada</strong> para ~R$ ' + formatMoney(entradaParaCaber) + (entradaDisp > 0 ? ' (+R$ ' + formatMoney(Math.max(0, entradaParaCaber - entradaDisp)) + ')' : '') + ' — aí a parcela cabe na sua renda atual.</li></ul>' });
+                }
+            }
+
+            const titulo = tudoOk
+                ? '✅ Com o que você tem hoje, este imóvel está ao seu alcance.'
+                : '🧭 Ainda não fecha — mas dá para traçar o caminho:';
+            box.innerHTML = '<div class="vi-diag ' + (tudoOk ? 'ok' : 'gap') + '"><div class="vi-diag-titulo">' + titulo + '</div><ul>' +
+                linhas.map(l => '<li class="' + (l.ok ? 'ok' : 'gap') + '">' + l.t + '</li>').join('') + '</ul></div>';
+
+            r.situacao = { entrada, fgts, renda, ok: tudoOk, texto: linhas.map(l => l.t.split('</li>').join(' ').split('<ul>').join(' ').replace(/<[^>]+>/g, '')).join(' | ') };
+        }
+
+        function irParaSimulacaoCompleta() {
+            const r = ultimoImovelEmVista;
+            selecionarObjetivo('completo');
+            if (r) {
+                document.getElementById('valorImovel').value = 'R$ ' + r.valor.toLocaleString('pt-BR');
+                const opt = document.querySelector('.tipo-option[data-tipo="' + r.tipo + '"]');
+                if (opt) opt.click();
+                if (r.situacao) {
+                    if (r.situacao.entrada > 0) document.getElementById('entrada').value = 'R$ ' + r.situacao.entrada.toLocaleString('pt-BR');
+                    if (r.fgtsOk) document.getElementById('fgts').value = r.situacao.fgts > 0 ? 'R$ ' + r.situacao.fgts.toLocaleString('pt-BR') : '';
+                    if (r.situacao.renda > 0) document.getElementById('renda').value = 'R$ ' + r.situacao.renda.toLocaleString('pt-BR');
+                }
+                atualizarRendaIdeal();
+            }
+            document.getElementById('modoCompleto').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        /* ---------- captura "Quero um plano do Cal" ---------- */
+        function pedirPlanoDoCal() {
+            contextoLead = 'plano';
+            registrarEvento('lead_started', { modo: 'imovel_em_vista' });
+            abrirLeadModal('plano');
+        }
+
+        function concluirPlanoDoCal() {
+            const r = ultimoImovelEmVista;
+            if (!r) return;
+            const nome = document.getElementById('nome').value.trim();
+            const telefone = document.getElementById('telefone').value.trim();
+            const s = r.situacao;
+
+            const linhasCRM = [
+                'IMOVEL EM VISTA (via calculadora)',
+                'Imovel: ' + nomeTipo(r.tipo) + ' · R$ ' + formatMoney(r.valor),
+                linhaImovelRef(),
+                'Entrada minima: R$ ' + formatMoney(r.entradaMin) + ' | Financiamento: R$ ' + formatMoney(r.vf),
+                'Renda necessaria: a partir de R$ ' + formatMoney(r.rendaLeve) + (r.ehTerreno ? ' (SAC)' : ' (PRICE) / R$ ' + formatMoney(r.rendaSac) + ' (SAC 30a)'),
+                'Custos escritura: ~R$ ' + formatMoney(r.itbi + r.registro) + ' | Total p/ sair do zero: R$ ' + formatMoney(r.totalSaida),
+                s ? 'SITUACAO HOJE: entrada R$ ' + formatMoney(s.entrada) + (r.fgtsOk ? ' + FGTS R$ ' + formatMoney(s.fgts) : '') + ' | renda R$ ' + formatMoney(s.renda) + '\n' + (s.ok ? 'AO ALCANCE — ' : 'GAP — ') + s.texto : 'Situacao atual nao informada',
+                linhaCampanha()
+            ].filter(Boolean);
+
+            const payload = {
+                nome: nome, telefone: telefone,
+                origem: 'Calculadora de Financiamento',
+                tipoInteresse: 'Imovel em vista - ' + nomeTipo(r.tipo),
+                orcamento: r.valor,
+                funil: 'Novo Lead',
+                temperatura: (s && s.ok) ? 'Quente' : 'Morno',
+                observacoes: linhasCRM.join('\n')
+            };
+            fetch('/.netlify/functions/enviar-lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(function () { });
+            registrarEvento('lead_submitted', { modo: 'imovel_em_vista' });
+
+            const zap = [
+                'Olá, Cal! Sou ' + nome + '.',
+                'Vi um ' + (r.ehTerreno ? 'terreno' : 'imóvel') + ' de R$ ' + formatMoney(r.valor) + ' (' + nomeTipo(r.tipo) + (imovelRef.id ? ', ref. ' + imovelRef.id : '') + ') e fiz a simulação "imóvel em vista":',
+                '• Entrada mínima: R$ ' + formatMoney(r.entradaMin),
+                '• Renda necessária: a partir de R$ ' + formatMoney(r.rendaLeve),
+                '• Custos de escritura: ~R$ ' + formatMoney(r.itbi + r.registro),
+                s ? '• Hoje tenho: entrada R$ ' + formatMoney(s.entrada + (r.fgtsOk ? s.fgts : 0)) + ' e renda R$ ' + formatMoney(s.renda) : '',
+                imovelRef.link ? '• Anúncio: ' + imovelRef.link : '',
+                '',
+                s && s.ok ? 'Quero entender os próximos passos!' : 'Quero um plano para chegar lá!'
+            ].filter(l => l !== '');
+            registrarEvento('whatsapp_clicked', { modo: 'imovel_em_vista' });
+            window.open('https://wa.me/' + WHATSAPP_CAL + '?text=' + encodeURIComponent(zap.join('\n')), '_blank');
+        }
+
+        /* ---------- parâmetros da URL: ?valor=799000&tipo=novo&imovel=799&link=https://... ---------- */
+        function aplicarParametrosURL() {
+            const p = new URLSearchParams(location.search);
+            const valor = parseInt((p.get('valor') || '').replace(/\D/g, ''), 10) || 0;
+            const tipo = (p.get('tipo') || '').toLowerCase();
+            imovelRef.id = (p.get('imovel') || '').replace(/[^\w\-\.]/g, '').slice(0, 40);
+            const link = p.get('link') || '';
+            if (/^https?:\/\//i.test(link)) imovelRef.link = link.slice(0, 300);
+
+            if (['novo', 'usado', 'terreno', 'construir'].indexOf(tipo) >= 0) {
+                setViTipo(tipo);
+                const opt = document.querySelector('.tipo-option[data-tipo="' + tipo + '"]');
+                if (opt) opt.click();
+            }
+            if (valor > 0) {
+                const txt = 'R$ ' + valor.toLocaleString('pt-BR');
+                document.getElementById('valorImovel').value = txt;
+                document.getElementById('viValor').value = txt;
+                atualizarRendaIdeal();
+                selecionarObjetivo('imovel');
+                simularImovelEmVista();          // resultado na hora — sem cadastro
+                registrarEvento('simulation_started', { modo: 'imovel_em_vista', via: 'url' });
+            }
+            registrarEvento('page_view', Object.assign({ valor: valor || undefined }, origemUTM));
+        }
+        aplicarParametrosURL();
     </script>
 </body>
 </html>

@@ -689,6 +689,30 @@
         }
     
 /* =====================================================================
+   SELETOR DE OBJETIVO (Simulacao completa x Tenho um imovel em vista)
+   ===================================================================== */
+.objetivo-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+.objetivo-option {
+    padding: 14px 12px;
+    border: 1.5px solid var(--cinza-claro);
+    border-radius: 12px;
+    background: var(--branco);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.25s ease;
+}
+.objetivo-option:hover { border-color: var(--cinza); transform: translateY(-2px); }
+.objetivo-option.active { border-color: var(--terra-medio); background: var(--terra-medio); color: var(--branco); }
+.objetivo-option h3 { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 600; margin-bottom: 3px; }
+.objetivo-option p { font-size: 12px; opacity: 0.85; line-height: 1.35; }
+@media (max-width: 768px) { .objetivo-option h3 { font-size: 15px; } .objetivo-option p { font-size: 11px; } }
+
+/* =====================================================================
    PODER DE COMPRA (imovel/index.html) — estilos próprios da 2ª ferramenta
    ===================================================================== */
 .tipo-toggle.vi-tipo-toggle { grid-template-columns: repeat(4, 1fr); }

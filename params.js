@@ -16,6 +16,9 @@ const WHATSAPP_CAL = '5547999001754';
 // Custos de aquisicao (% sobre o valor do imovel): ITBI Brusque/SC + registro/escritura
 const CUSTOS_AQUISICAO = { itbi: 2.0, registro: 1.0 };
 
+// Comprometimento maximo da renda com a parcela (regra de mercado: 30%)
+const COMPROMETIMENTO_MAX = 0.30;
+
 // Juros maximos da Faixa 4 do MCMV (Portaria MCID 333/2026)
 const MCMV_TAXA_F4 = 9.9;
 

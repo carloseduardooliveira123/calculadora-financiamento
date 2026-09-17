@@ -39,16 +39,16 @@ jobs:
           prompt: |
             Voce mantem atualizados os parametros de financiamento imobiliario da calculadora do corretor Cal Oliveiras, publicada a partir deste repositorio (GitHub Pages e Netlify). Os valores aparecem para clientes reais.
 
-            ARQUIVO ALVO: index.html (na raiz do repositorio, ja presente no diretorio de trabalho).
+            ARQUIVO ALVO: params.js (na raiz do repositorio). E um arquivo pequeno, SO com parametros, lido pelas DUAS ferramentas do site (index.html = Calculadora e imovel/index.html = Poder de Compra). NAO edite os HTML.
 
-            Dentro do <script> do index.html, os parametros estao em:
+            Dentro do params.js os parametros estao em:
             - const MCMV_FAIXAS = [...]  (faixas 1 a 4: rendaMax e tetoImovel)
             - const TETO_SFH = 2250000
             - const TERRENO = { ltv, prazoMax, limiteMax, valorMin, taxaNominal, cetEfetivo }  (lote urbanizado / terreno puro)
             - const BANCOS = {...}  (10 bancos; campos numericos: taxa, ltvNovo, ltvUsado, prazoMax, limiteMax; alguns tem terreno: true e terrenoLtv)
-            E o carimbo de data no rodape: <span id="dataVerificacao">DD/MM/AAAA</span>
+            E o carimbo de data: const DATA_VERIFICACAO = 'DD/MM/AAAA'; (aparece no rodape das duas ferramentas)
 
-            ECONOMIA DE TOKENS: o index.html e grande — NAO leia o arquivo inteiro. Localize as linhas dos parametros com Bash (ex.: grep -n "rendaMax\|const TETO_SFH\|const TERRENO\|taxa:\|terrenoLtv\|dataVerificacao" index.html) e leia apenas esses trechos.
+            O params.js e pequeno (~100 linhas): pode ler ele inteiro de uma vez. NAO leia os arquivos HTML.
 
             SEJA EFICIENTE (ha limite de turnos): agrupe as buscas (ex.: uma busca por "taxas financiamento imobiliario bancos 2026" cobre varios bancos de uma vez; faca NO MAXIMO 6 buscas no total (2-3 paginas comparativas ja cobrem os 10 bancos)), evite releituras desnecessarias, e assim que terminar as edicoes FACA O COMMIT E O PUSH IMEDIATAMENTE (passo 5) antes de qualquer resumo. O resumo final deve ser curto (ate 10 linhas).
 
@@ -59,10 +59,10 @@ jobs:
                - Teto do SFH (hoje R$ 2.250.000) e % maximo financiado para imovel NOVO e USADO (entrada minima).
                - Faixas do MCMV (1 a 4): renda maxima e teto do imovel. Referencia atual: Faixa 4 = renda ate R$ 13.000, imovel ate R$ 600.000, juros ate 9,9% a.a. (Portaria MCID 333/2026).
                - TERRENO (lote urbanizado): cota maxima, prazo maximo e taxa da modalidade Caixa "SBPE - Aquisicao de Lote Urbanizado". Referencia confirmada no simulador OFICIAL da Caixa em jul/2026: cota 80%, prazo 240 meses, SAC/TR, juros nominais 12,73% a.a. (efetivos 13,50%), sem FGTS, fora do MCMV. Cotas por banco hoje: Caixa 80, Sicoob 80, Bradesco 70 (campo terrenoLtv).
-            3. Compare com os valores atuais no index.html. Para cada divergencia confirmada por fonte confiavel E MAIS RECENTE que a referencia citada, use a ferramenta Edit para alterar APENAS o numero correspondente (sem quebrar a sintaxe JS, sem mexer em textos/estrutura/estilo).
-            4. SEMPRE atualize o <span id="dataVerificacao"> para a data de hoje (DD/MM/AAAA), mesmo que nada mais mude.
+            3. Compare com os valores atuais no params.js. Para cada divergencia confirmada por fonte confiavel E MAIS RECENTE que a referencia citada, use a ferramenta Edit para alterar APENAS o numero correspondente (sem quebrar a sintaxe JS, sem mexer em textos/estrutura/estilo).
+            4. SEMPRE atualize o DATA_VERIFICACAO para a data de hoje (DD/MM/AAAA), mesmo que nada mais mude.
             5. Publique as mudancas rodando no Bash:
-               git add index.html
+               git add params.js
                git commit -m "chore: atualiza parametros dos bancos $(date +%F)"
                git push origin HEAD:main
 
@@ -70,7 +70,7 @@ jobs:
             - NUNCA invente numeros. So altere um parametro se houver fonte publica, confiavel e datada confirmando o novo valor. Na duvida, mantenha o valor atual e relate a duvida.
             - ARMADILHA CONHECIDA: a FAQ antiga da Caixa sobre lote urbanizado (70% SAC / 60% PRICE) esta DESATUALIZADA e saiu do ar; conteudo antigo em cache de buscador NAO e fonte valida. NAO regredir a cota de terreno para 70% com base nisso. So altere terreno com fonte claramente mais recente que jul/2026.
             - Mantenha ltvNovo >= ltvUsado e terrenoLtv <= ltvUsado.
-            - Nao altere estrutura, estilo, textos ou logica do arquivo, apenas os numeros dos parametros e a data.
+            - Nao altere estrutura, comentarios ou nomes de campos do params.js, apenas os numeros dos parametros e a data. NUNCA edite index.html, imovel/index.html ou estilo.css.
             - Se nada (alem da data) mudar, ainda assim faca o commit/push so com a data atualizada.
 
             Ao final, escreva um resumo: o que verificou, o que mudou (antigo -> novo + fonte + data da fonte), o que ficou em duvida, e confirme se o push foi concluido.
@@ -91,15 +91,15 @@ jobs:
             echo "Robo nao publicou nada nesta rodada."
             exit 0
           fi
-          DIFF=$(git diff "$BASE" "$HEAD" -- index.html | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' | grep -v 'dataVerificacao' || true)
+          DIFF=$(git diff "$BASE" "$HEAD" -- params.js | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' | grep -v 'DATA_VERIFICACAO' || true)
           if [ -z "$DIFF" ]; then
             echo "So a data de verificacao mudou — sem aviso."
             exit 0
           fi
           {
-            echo "O robo semanal alterou parametros da calculadora (https://simule-aqui.netlify.app)."
+            echo "O robo semanal alterou parametros das ferramentas (simule-aqui.netlify.app e /imovel)."
             echo
-            echo "Linhas removidas (-) e adicionadas (+) no index.html:"
+            echo "Linhas removidas (-) e adicionadas (+) no params.js:"
             echo
             echo '```diff'
             echo "$DIFF"
@@ -107,7 +107,7 @@ jobs:
             echo
             echo "Commit: https://github.com/$REPO/commit/$HEAD"
             echo
-            echo "Se algum valor estiver errado, corrija no index.html (ou peca ao Claude) — o site republica sozinho."
+            echo "Se algum valor estiver errado, corrija no params.js (ou peca ao Claude) — o site republica sozinho."
           } > /tmp/aviso.md
           gh issue create \
             --title "📊 Parametros alterados pelo robo — $(date +%d/%m/%Y)" \

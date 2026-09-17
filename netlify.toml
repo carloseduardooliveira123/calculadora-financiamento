@@ -1,4 +1,6 @@
-# Configuração de deploy do Netlify — site estático (um único index.html)
+# Configuração de deploy do Netlify — duas ferramentas no mesmo site:
+#   /         = Calculadora de Financiamento (index.html)
+#   /imovel/  = Poder de Compra (imovel/index.html)
 [build]
   publish = "."
   command = ""

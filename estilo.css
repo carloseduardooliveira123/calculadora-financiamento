@@ -759,3 +759,255 @@
 @media (min-width: 769px) { .vi-ctas { grid-template-columns: 1fr 1fr; } .vi-ctas .btn:first-child:nth-last-child(3) { grid-column: 1 / -1; } }
 @media (max-width: 768px) { .vi-titulo { font-size: 19px; } }
 @media print { .vi-ajuste, .vi-ctas { display: none !important; } .vi-card { border-color: #000 !important; } }
+
+/* =====================================================================
+   TEMA E1 — "VERDE NATUREZA" (fundo escuro + vidro fosco + brilho)
+   Escolhido em 21/10/2026. Vale para as duas telas.
+   Para voltar à identidade terra: git checkout v1.1-terra -- estilo.css
+   O bloco de impressão no fim do arquivo mantém o PDF branco.
+   ===================================================================== */
+:root {
+    --fundo: #0B0F0C;
+    --vidro: rgba(255, 255, 255, .06);
+    --vidro-forte: rgba(255, 255, 255, .09);
+    --borda-vidro: rgba(255, 255, 255, .12);
+    --texto: #F2F7F3;
+    --texto-2: #9FB0A6;
+    --acento: #B8E986;
+    --acento-forte: #8BC34A;
+    --acento-claro: #C5E1A5;
+
+    /* Os tokens antigos da identidade terra viram tons claros: dezenas de regras
+       da base usam eles como COR DE TEXTO, e sobre o vidro escuro ficariam
+       ilegiveis. O bloco de impressao no fim usa cores fixas, entao o PDF
+       continua escuro sobre branco. */
+    --preto: #0B0F0C;
+    --terra-escuro: #F2F7F3;
+    --terra-medio: #B8E986;
+    --cinza: #9FB0A6;
+    --cinza-claro: #CFE0D3;
+    --aprovado: #B8E986;
+}
+
+body {
+    background: var(--fundo);
+    color: var(--texto);
+}
+
+/* brilho de fundo (fixo, não interfere na rolagem nem no clique) */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(900px 500px at 15% -5%, rgba(139, 195, 74, .34), transparent 60%),
+        radial-gradient(700px 420px at 95% 15%, rgba(38, 166, 154, .28), transparent 62%),
+        radial-gradient(800px 600px at 60% 110%, rgba(156, 203, 107, .18), transparent 60%);
+}
+
+.container {
+    background: var(--vidro);
+    border: 1px solid var(--borda-vidro);
+    border-radius: 28px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 30px 90px rgba(0, 0, 0, .55);
+}
+
+.header {
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    padding: 34px 24px 18px;
+}
+.logo-name { color: var(--texto); }
+.logo-sub { color: #A8D5A2; }
+.logo-creci { border-color: rgba(255, 255, 255, .22); color: #CFE0D3; }
+.header h1 { color: var(--texto); font-size: 25px; margin-top: 12px; }
+.header .subtitle { color: var(--texto-2); }
+.content { background: transparent; }
+
+/* ---------- superfícies de vidro ---------- */
+.mode-btn, .tipo-box, .form-section, .objetivo-option, .vi-card, .vi-ajuste,
+.detail-item, .caixa-colapsavel, .bank-card, .bank-info-box, .warning-box,
+.alternatives, .suggestions, .rejection-details, .dicas-box, .resumo-sim,
+.info-disclaimer, .approval-notice, .mcmv-banner, .vi-diag, .modal-box {
+    background: var(--vidro);
+    border: 1px solid var(--borda-vidro);
+    border-radius: 18px;
+    color: var(--texto);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: none;
+}
+.vi-card, .form-section, .vi-ajuste, .modal-box { border-radius: 20px; }
+
+/* ---------- textos ---------- */
+.mode-btn h3, .tipo-box-title, .form-section h3, .objetivo-option h3, .vi-titulo,
+.vi-ajuste h4, .detail-value, .bank-name, .modal-box h3, .resumo-titulo,
+.dicas-box h4, .info-disclaimer h4, .vi-diag-titulo { color: var(--texto); }
+
+.mode-btn p, .objetivo-option p, .detail-label, .detail-sub, .vi-ajuste > p, .vi-kicker,
+.renda-hint, .modal-privacy, .print-rodape, .resumo-linha, .dicas-sub,
+.modal-box > p, .vi-notas .vi-mini { color: var(--texto-2); }
+
+.vi-notas p, .colapsavel-corpo, .info-disclaimer p, .info-disclaimer li,
+.bank-info-box ul, .alternatives li, .suggestions li, .rejection-details li,
+.vi-diag > ul > li, .dicas-box li, .approval-notice p { color: #D6E3D8; }
+
+.form-group label, .section-label { color: #CFE0D3; }
+.renda-hint strong, .modal-box strong, .colapsavel-corpo strong, .warning-box strong,
+.vi-titulo strong, .detail-value.destaque, .detail-value.verde,
+.alternatives h4, .bank-info-box h4, .colapsavel-corpo h4 { color: var(--acento); }
+.dicas-box li strong, .approval-notice h5, .suggestions h4 { color: var(--acento); }
+.mcmv-banner p { color: #D6E3D8; }
+.mcmv-banner strong, .mcmv-banner h4 { color: var(--acento); }
+.mcmv-banner.indisponivel h4, .mcmv-banner.indisponivel strong { color: var(--acento); }
+.mcmv-banner.indisponivel p { color: var(--texto-2); }
+
+/* ---------- campos ---------- */
+.form-group input, .form-group select {
+    background: var(--vidro-forte);
+    border: 1px solid rgba(255, 255, 255, .18);
+    color: var(--texto);
+    border-radius: 14px;
+}
+.form-group input::placeholder { color: rgba(242, 247, 243, .45); }
+.form-group input:focus, .form-group select:focus {
+    border-color: var(--acento-forte);
+    box-shadow: 0 0 0 3px rgba(139, 195, 74, .18);
+}
+.form-group select option { background: #16251B; color: var(--texto); }
+
+/* ---------- seleções ---------- */
+.tipo-option { background: var(--vidro); border-color: rgba(255, 255, 255, .14); color: #CFE0D3; border-radius: 12px; }
+.tipo-option.active {
+    background: linear-gradient(135deg, var(--acento-claro), var(--acento-forte));
+    border-color: transparent;
+    color: #14240F;
+}
+/* caixas grandes (Inteligente / Comparar / Banco) ativas: vidro esverdeado,
+   nao bloco solido — o verde cheio so fica no botao de acao */
+.mode-btn.active {
+    background: linear-gradient(135deg, rgba(156, 203, 107, .32), rgba(156, 203, 107, .12));
+    border-color: rgba(156, 203, 107, .6);
+    color: var(--texto);
+}
+.mode-btn.active h3 { color: var(--texto); }
+.mode-btn.active p { color: #CFE0D3; }
+.objetivo-option.active {
+    background: linear-gradient(135deg, rgba(156, 203, 107, .32), rgba(156, 203, 107, .12));
+    border-color: rgba(156, 203, 107, .6);
+    color: var(--texto);
+}
+.objetivo-option.active h3 { color: var(--texto); }
+.objetivo-option:hover, .mode-btn:hover { border-color: rgba(156, 203, 107, .45); }
+
+/* ---------- botões ---------- */
+.btn {
+    background: linear-gradient(135deg, var(--acento-claro) 0%, var(--acento-forte) 100%);
+    color: #101A0C;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(139, 195, 74, .32);
+}
+.btn:hover { background: linear-gradient(135deg, #D2EBB8 0%, #96D154 100%); }
+.vi-btn-sec {
+    background: var(--vidro-forte) !important;
+    color: #DCE9D6 !important;
+    border: 1px solid rgba(255, 255, 255, .22) !important;
+    box-shadow: none;
+}
+.vi-btn-sec:hover { background: rgba(255, 255, 255, .14) !important; }
+.btn-imprimir {
+    background: var(--vidro-forte);
+    color: #DCE9D6;
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: 14px;
+}
+.btn-imprimir:hover { background: rgba(255, 255, 255, .14); }
+.modal-cancel { color: var(--texto-2); }
+.modal-cancel:hover { color: var(--acento); }
+
+/* ---------- status e destaques ---------- */
+.bank-card.approved { border-color: rgba(31, 166, 83, .65); border-width: 2px; background: linear-gradient(135deg, rgba(31, 166, 83, .16), rgba(255, 255, 255, .05)); }
+.bank-card.rejected { border-color: rgba(224, 49, 49, .5); background: linear-gradient(135deg, rgba(224, 49, 49, .14), rgba(255, 255, 255, .05)); }
+.rejection-details { border-left: 4px solid var(--reprovado); }
+.suggestions { border-left: 4px solid var(--acento-forte); }
+.warning-box { border-left: 4px solid var(--acento-forte); }
+.alternatives { border-left: 4px solid rgba(255, 255, 255, .3); }
+.vi-diag { border-left: 3px solid var(--acento-forte); border-radius: 16px; }
+.vi-diag.ok { border-left-color: var(--aprovado-vivo); }
+.dicas-box { border-left: 4px solid var(--acento-forte); }
+.faixa-tag, .mcmv-banner .faixa-tag { background: rgba(156, 203, 107, .22); color: var(--acento); border: 1px solid rgba(156, 203, 107, .45); }
+.chk-pdf-wrap input { accent-color: var(--acento-forte); }
+.chk-pdf-wrap { color: var(--texto-2); }
+
+/* ---------- modal e rodapé ---------- */
+.modal-overlay { background: rgba(6, 10, 7, .72); backdrop-filter: blur(6px); }
+.modal-tag { background: rgba(156, 203, 107, .22); color: var(--acento); }
+.modal-error { color: #FF8585; }
+.footer { background: transparent; border-top: 1px solid rgba(255, 255, 255, .08); color: var(--texto-2); }
+.footer .nome { color: var(--texto); }
+.footer a { color: var(--acento); }
+.caixa-colapsavel > summary { color: #DCE9D6; }
+.caixa-colapsavel > summary:hover { color: var(--acento); }
+
+/* ---------- aparelhos sem suporte a desfoque: fundo sólido ---------- */
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+    .container { background: #16251B; }
+    .mode-btn, .tipo-box, .form-section, .objetivo-option, .vi-card, .vi-ajuste,
+    .detail-item, .caixa-colapsavel, .bank-card, .bank-info-box, .warning-box,
+    .alternatives, .suggestions, .rejection-details, .dicas-box, .resumo-sim,
+    .info-disclaimer, .approval-notice, .mcmv-banner, .vi-diag, .modal-box { background: #1B2D21; }
+    .form-group input, .form-group select { background: #22382A; }
+}
+
+/* =====================================================================
+   IMPRESSÃO / PDF — sempre branco com texto escuro.
+   Precisa vir DEPOIS do tema para vencer na cascata.
+   ===================================================================== */
+@media print {
+    body { background: #fff !important; color: #101010 !important; }
+    body::before { display: none !important; }
+    /* zera as cores claras do tema: tudo vira texto escuro sobre branco.
+       As excecoes (cabecalho, selos, destaques) vem depois e vencem. */
+    .container, .container * { color: #313128 !important; }
+    .container {
+        background: #fff !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    .header { background: #fff !important; border-bottom: 2px solid #493928 !important; padding: 8px 0 12px !important; }
+    .header .logo-name, .header h1 { color: #101010 !important; }
+    .header .logo-sub, .header .logo-creci, .header .subtitle { color: #493928 !important; }
+    .content { background: #fff !important; }
+
+    .mode-btn, .tipo-box, .form-section, .objetivo-option, .vi-card, .vi-ajuste,
+    .detail-item, .caixa-colapsavel, .bank-card, .bank-info-box, .warning-box,
+    .alternatives, .suggestions, .rejection-details, .dicas-box, .resumo-sim,
+    .info-disclaimer, .approval-notice, .mcmv-banner, .vi-diag, .modal-box {
+        background: #fff !important;
+        border-color: #CECBBE !important;
+        color: #313128 !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        box-shadow: none !important;
+    }
+    .mcmv-banner, .mcmv-banner *, .vi-card, .vi-card *, .resumo-sim, .resumo-sim * { background: #fff !important; }
+    .vi-card { border: 1.5px solid #493928 !important; }
+
+    .vi-titulo, .vi-titulo strong, .detail-value, .detail-value.destaque, .detail-value.verde,
+    .resumo-titulo, .resumo-linha, .bank-name, .mcmv-banner h4, .mcmv-banner strong,
+    .mcmv-banner p, .vi-notas p, .ficha-val, .ficha-val.destaque { color: #313128 !important; }
+    .vi-kicker, .detail-label, .detail-sub, .vi-notas .vi-mini, .print-rodape, .ficha-lbl { color: #6B6B5E !important; }
+    .ficha-val.verde { color: #136B36 !important; }
+    .faixa-tag, .mcmv-banner .faixa-tag { background: #fff !important; color: #493928 !important; border: 1px solid #493928 !important; }
+    .status-badge.approved { background: #fff !important; color: #136B36 !important; border: 1.5px solid #136B36 !important; }
+    .status-badge.rejected { background: #fff !important; color: #a01e1e !important; border: 1.5px solid #a01e1e !important; }
+    .ficha td { border-bottom-color: #CECBBE !important; }
+    a { color: #000 !important; }
+}

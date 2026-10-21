@@ -1011,3 +1011,19 @@ body::before {
     .ficha td { border-bottom-color: #CECBBE !important; }
     a { color: #000 !important; }
 }
+
+/* ---------- MARCA CALc ---------- */
+.logo-marca {
+    display: block;
+    margin: 0 auto 14px;
+    width: 96px;
+    height: 96px;
+    border-radius: 22%;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .45);
+}
+@media (max-width: 768px) { .logo-marca { width: 76px; height: 76px; margin-bottom: 10px; } }
+
+/* no PDF a marca entra menor e sem sombra */
+@media print {
+    .logo-marca { width: 54px !important; height: 54px !important; box-shadow: none !important; margin-bottom: 6px !important; }
+}

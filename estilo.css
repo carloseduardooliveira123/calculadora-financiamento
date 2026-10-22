@@ -1013,17 +1013,17 @@ body::before {
 }
 
 /* ---------- MARCA CALc ---------- */
+/* assinatura horizontal em vetor: simbolo + nome + descricao */
 .logo-marca {
     display: block;
-    margin: 0 auto 14px;
-    width: 96px;
-    height: 96px;
-    border-radius: 22%;
-    box-shadow: 0 10px 26px rgba(0, 0, 0, .45);
+    margin: 0 auto 10px;
+    width: 340px;
+    height: auto;
+    max-width: 86%;
 }
-@media (max-width: 768px) { .logo-marca { width: 76px; height: 76px; margin-bottom: 10px; } }
+@media (max-width: 768px) { .logo-marca { width: 260px; margin-bottom: 8px; } }
 
-/* no PDF a marca entra menor e sem sombra */
+/* no PDF entra a versao monocromatica, menor */
 @media print {
-    .logo-marca { width: 54px !important; height: 54px !important; box-shadow: none !important; margin-bottom: 6px !important; }
+    .logo-marca { width: 230px !important; margin-bottom: 4px !important; content: url("marca/assinatura-horizontal-mono.svg"); }
 }

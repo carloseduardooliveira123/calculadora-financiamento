@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="CALc app icon">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#06130E"/><stop offset="1" stop-color="#001A19"/></linearGradient>
+<linearGradient id="g" x1="105" y1="110" x2="390" y2="400" gradientUnits="userSpaceOnUse"><stop stop-color="#B8F58A"/><stop offset=".48" stop-color="#39DDAF"/><stop offset="1" stop-color="#00B9B5"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="url(#bg)"/>
+<rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="#38D9B0" stroke-opacity=".35" stroke-width="2"/>
+<path d="M354 145 C329 119 296 105 258 105 C174 105 119 166 119 256 C119 346 174 407 258 407 C296 407 329 393 354 367" transform="translate(0 0)" fill="none" stroke="url(#g)" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

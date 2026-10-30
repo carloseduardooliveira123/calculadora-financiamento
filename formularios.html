@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<title>Formulários</title>
+</head>
+<body>
+<!--
+  Definição do formulário para o Netlify Forms. Não é exibido em nenhuma tela:
+  serve só para o Netlify reconhecer o formulário no deploy. Quem envia os
+  dados é a função netlify/functions/enviar-lead.mjs, depois que o lead entra
+  no VEXOR. O e-mail de aviso é configurado no painel do Netlify.
+-->
+<form name="lead-calculadora" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="bot-field">
+  <input name="nome">
+  <input name="telefone">
+  <input name="origem">
+  <input name="interesse">
+  <input name="valor">
+  <input name="temperatura">
+  <textarea name="resumo"></textarea>
+</form>
+</body>
+</html>

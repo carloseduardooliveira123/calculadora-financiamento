@@ -7,6 +7,10 @@
 //   CALLMEBOT_APIKEY  → usa o CallMeBot (grátis, uso pessoal)
 //   TEXTMEBOT_APIKEY  → usa o TextMeBot (pago, alternativa quando o CallMeBot lota)
 //   AVISO_WHATSAPP_TELEFONE (opcional) → número que recebe o aviso, com DDI
+//
+// E registra cada lead no formulário "lead-calculadora" do Netlify Forms
+// (definido em formularios.html). O Netlify manda e-mail ao Cal a cada envio,
+// configurado no painel: Forms → Form notifications → Email notification.
 
 const CRM_ENDPOINT = 'https://vexor-crm.onrender.com/api/leads';
 const VEXOR_URL = 'https://vexor-crm.netlify.app';
@@ -47,6 +51,11 @@ export default async (req) => {
     funil: lead.funil || 'Novo Lead',
     temperatura: lead.temperatura || 'Morno',
     observacoes: lead.observacoes || null,
+    // Faz o lead cair em "Atenção Imediata" no Dashboard do VEXOR, que lista
+    // os contatos marcados para hoje ou atrasados. Data no mesmo formato (UTC)
+    // que o front do VEXOR usa para comparar.
+    proximoContato: lead.proximoContato || new Date().toISOString().slice(0, 10),
+    acao: lead.acao || 'WhatsApp',
   };
 
   try {
@@ -60,7 +69,7 @@ export default async (req) => {
     // Só avisa quando o lead realmente entrou no CRM. Falha no aviso nunca
     // atrapalha o cliente nem o registro do lead.
     if (resp.ok) {
-      await avisarNoWhatsApp(payload);
+      await Promise.allSettled([avisarPorEmail(payload), avisarNoWhatsApp(payload)]);
     }
 
     return new Response(body, {
@@ -91,6 +100,37 @@ export function montarAviso(lead) {
     `Temperatura: ${lead.temperatura}`,
     `Detalhes no VEXOR: ${VEXOR_URL}`,
   ].join('\n');
+}
+
+// Envia o lead ao Netlify Forms; o próprio Netlify dispara o e-mail ao Cal.
+async function avisarPorEmail(lead) {
+  const env = (k) => (globalThis.Netlify?.env?.get?.(k)) ?? process.env[k];
+  const site = env('URL') || 'https://simule-aqui.netlify.app';
+  const valor = Number(lead.orcamento) > 0 ? 'R$ ' + Number(lead.orcamento).toLocaleString('pt-BR') : '';
+  const campos = new URLSearchParams({
+    'form-name': 'lead-calculadora',
+    nome: lead.nome,
+    telefone: lead.telefone,
+    origem: lead.origem || '',
+    interesse: lead.tipoInteresse || '',
+    valor,
+    temperatura: lead.temperatura || '',
+    resumo: lead.observacoes || '',
+  });
+  const controle = new AbortController();
+  const limite = setTimeout(() => controle.abort(), 6000);
+  try {
+    await fetch(site + '/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: campos.toString(),
+      signal: controle.signal,
+    });
+  } catch {
+    // silencioso: o lead já está salvo no CRM
+  } finally {
+    clearTimeout(limite);
+  }
 }
 
 async function avisarNoWhatsApp(lead) {
